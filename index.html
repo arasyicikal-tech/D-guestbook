@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>D'Guestbook</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Georgia, serif;
+      background: #f8f5f0;
+      color: #3d352e;
+      text-align: center;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 25px;
+      background:
+        linear-gradient(rgba(248,245,240,.75), rgba(248,245,240,.9));
+    }
+
+    .small-title {
+      font-family: Arial, sans-serif;
+      letter-spacing: 4px;
+      font-size: 12px;
+      margin-bottom: 25px;
+      text-transform: uppercase;
+    }
+
+    .names {
+      font-size: 52px;
+      font-weight: normal;
+      line-height: 1.2;
+      margin-bottom: 18px;
+    }
+
+    .ampersand {
+      font-size: 30px;
+      font-style: italic;
+      margin: 5px 0;
+    }
+
+    .date {
+      font-family: Arial, sans-serif;
+      letter-spacing: 3px;
+      font-size: 13px;
+      margin-bottom: 45px;
+    }
+
+    .message {
+      max-width: 350px;
+      font-size: 16px;
+      line-height: 1.8;
+      font-style: italic;
+      margin-bottom: 40px;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 15px 32px;
+      border: 1px solid #8d8175;
+      color: #3d352e;
+      text-decoration: none;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: .3s;
+    }
+
+    .button:hover {
+      background: #3d352e;
+      color: white;
+    }
+
+    .brand {
+      position: absolute;
+      bottom: 25px;
+      font-family: Arial, sans-serif;
+      font-size: 10px;
+      letter-spacing: 3px;
+      opacity: .6;
+    }
+  </style>
+</head>
+
+<body>
+
+  <section class="hero">
+
+    <div class="small-title">
+      The Wedding Of
+    </div>
+
+    <h1 class="names">
+      Cikal
+      <div class="ampersand">&</div>
+      Ayu
+    </h1>
+
+    <div class="date">
+      25 · 10 · 2026
+    </div>
+
+    <p class="message">
+      Terima kasih telah menjadi bagian
+      dari hari bahagia kami.
+    </p>
+
+    <a href="#" class="button">
+      Isi Guest Book
+    </a>
+
+    <div class="brand">
+      D'GUESTBOOK
+    </div>
+
+  </section>
+
+</body>
+</html>
