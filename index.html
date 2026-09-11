@@ -1,133 +1,576 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>D'Guestbook</title>
+<title>D'Guestbook — Cikal & Nadya</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-    body {
-      font-family: Georgia, serif;
-      background: #f8f5f0;
-      color: #3d352e;
-      text-align: center;
-    }
+html {
+  scroll-behavior: smooth;
+}
 
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 40px 25px;
-      background:
-        linear-gradient(rgba(248,245,240,.75), rgba(248,245,240,.9));
-    }
+body {
+  font-family: Georgia, "Times New Roman", serif;
+  background: #f8f5f0;
+  color: #3d352e;
+}
 
-    .small-title {
-      font-family: Arial, sans-serif;
-      letter-spacing: 4px;
-      font-size: 12px;
-      margin-bottom: 25px;
-      text-transform: uppercase;
-    }
+button,
+input,
+textarea {
+  font-family: inherit;
+}
 
-    .names {
-      font-size: 52px;
-      font-weight: normal;
-      line-height: 1.2;
-      margin-bottom: 18px;
-    }
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 50px 25px;
+  background: #f8f5f0;
+}
 
-    .ampersand {
-      font-size: 30px;
-      font-style: italic;
-      margin: 5px 0;
-    }
+.brand {
+  font-family: Arial, sans-serif;
+  letter-spacing: 5px;
+  font-size: 12px;
+  margin-bottom: 65px;
+  color: #81766c;
+}
 
-    .date {
-      font-family: Arial, sans-serif;
-      letter-spacing: 3px;
-      font-size: 13px;
-      margin-bottom: 45px;
-    }
+.small-title {
+  font-family: Arial, sans-serif;
+  letter-spacing: 5px;
+  font-size: 12px;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
 
-    .message {
-      max-width: 350px;
-      font-size: 16px;
-      line-height: 1.8;
-      font-style: italic;
-      margin-bottom: 40px;
-    }
+.names {
+  font-size: 58px;
+  font-weight: normal;
+  line-height: 1.05;
+}
 
-    .button {
-      display: inline-block;
-      padding: 15px 32px;
-      border: 1px solid #8d8175;
-      color: #3d352e;
-      text-decoration: none;
-      font-family: Arial, sans-serif;
-      font-size: 12px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      transition: .3s;
-    }
+.ampersand {
+  font-size: 30px;
+  margin: 12px 0;
+  font-style: italic;
+}
 
-    .button:hover {
-      background: #3d352e;
-      color: white;
-    }
+.date {
+  font-family: Arial, sans-serif;
+  letter-spacing: 4px;
+  font-size: 13px;
+  margin-top: 30px;
+}
 
-    .brand {
-      position: absolute;
-      bottom: 25px;
-      font-family: Arial, sans-serif;
-      font-size: 10px;
-      letter-spacing: 3px;
-      opacity: .6;
-    }
-  </style>
+.divider {
+  margin: 38px auto 28px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 180px;
+}
+
+.divider span {
+  height: 1px;
+  background: #b5a99d;
+  flex: 1;
+}
+
+.heart {
+  font-size: 18px;
+}
+
+.message {
+  max-width: 340px;
+  font-size: 17px;
+  line-height: 1.8;
+  font-style: italic;
+  margin-bottom: 40px;
+}
+
+.button {
+  border: 1px solid #8d8175;
+  background: transparent;
+  color: #3d352e;
+  padding: 16px 35px;
+  font-family: Arial, sans-serif;
+  letter-spacing: 3px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: .3s;
+}
+
+.button:hover {
+  background: #3d352e;
+  color: white;
+}
+
+.section {
+  display: none;
+  min-height: 100vh;
+  padding: 50px 22px;
+  background: #f8f5f0;
+}
+
+.section.active {
+  display: block;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-size: 36px;
+  font-weight: normal;
+  margin-bottom: 12px;
+}
+
+.section-subtitle {
+  font-family: Arial, sans-serif;
+  color: #81766c;
+  font-size: 12px;
+  letter-spacing: 2px;
+}
+
+.form-box {
+  max-width: 500px;
+  margin: auto;
+  background: #fffdf9;
+  padding: 30px 25px;
+  border: 1px solid #ded7ce;
+}
+
+label {
+  display: block;
+  text-align: left;
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  margin-bottom: 9px;
+  text-transform: uppercase;
+}
+
+input,
+textarea {
+  width: 100%;
+  border: 1px solid #cfc5ba;
+  background: white;
+  padding: 14px;
+  margin-bottom: 22px;
+  color: #3d352e;
+  font-size: 15px;
+  outline: none;
+}
+
+input:focus,
+textarea:focus {
+  border-color: #8d8175;
+}
+
+textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+
+.submit {
+  width: 100%;
+  background: #3d352e;
+  color: white;
+  border: none;
+  padding: 16px;
+  letter-spacing: 3px;
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.back {
+  display: block;
+  margin: 25px auto 0;
+  background: none;
+  border: none;
+  color: #81766c;
+  font-size: 12px;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+
+.success {
+  display: none;
+  text-align: center;
+  padding: 30px 10px;
+}
+
+.success.show {
+  display: block;
+}
+
+.success-icon {
+  font-size: 42px;
+  margin-bottom: 18px;
+}
+
+.success h3 {
+  font-size: 27px;
+  font-weight: normal;
+  margin-bottom: 12px;
+}
+
+.success p {
+  color: #81766c;
+  line-height: 1.7;
+}
+
+.guest-wall {
+  max-width: 650px;
+  margin: 50px auto 0;
+}
+
+.guest-card {
+  background: #fffdf9;
+  border: 1px solid #ded7ce;
+  padding: 23px;
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.guest-name {
+  font-weight: bold;
+  margin-bottom: 9px;
+  font-size: 16px;
+}
+
+.guest-message {
+  color: #665c53;
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+.guest-time {
+  font-family: Arial, sans-serif;
+  color: #a39a91;
+  font-size: 10px;
+  margin-top: 12px;
+}
+
+.empty {
+  text-align: center;
+  color: #91867c;
+  font-style: italic;
+  padding: 35px 10px;
+}
+
+.footer {
+  text-align: center;
+  font-family: Arial, sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: #a39a91;
+  margin-top: 60px;
+}
+
+@media (max-width: 480px) {
+  .names {
+    font-size: 50px;
+  }
+
+  .brand {
+    margin-bottom: 50px;
+  }
+
+  .hero {
+    padding: 35px 20px;
+  }
+
+  .section-title {
+    font-size: 32px;
+  }
+}
+</style>
 </head>
 
 <body>
 
-  <section class="hero">
+<!-- HALAMAN UTAMA -->
+<section id="home" class="hero">
 
-    <div class="small-title">
-      The Wedding Of
+  <div class="brand">
+    D'GUESTBOOK
+  </div>
+
+  <div class="small-title">
+    The Wedding Of
+  </div>
+
+  <h1 class="names">
+    Cikal
+    <div class="ampersand">&</div>
+    Nadya
+  </h1>
+
+  <div class="date">
+    25 · 10 · 2026
+  </div>
+
+  <div class="divider">
+    <span></span>
+    <div class="heart">♡</div>
+    <span></span>
+  </div>
+
+  <p class="message">
+    Terima kasih telah menjadi bagian
+    dari hari bahagia kami.
+  </p>
+
+  <button class="button" onclick="showGuestBook()">
+    ISI GUEST BOOK
+  </button>
+
+  <div class="footer">
+    CREATE LASTING MEMORIES
+  </div>
+
+</section>
+
+
+<!-- FORM GUEST BOOK -->
+<section id="guestbook" class="section">
+
+  <div class="section-header">
+
+    <div class="section-subtitle">
+      CIKAL & NADYA
     </div>
 
-    <h1 class="names">
-      Cikal
-      <div class="ampersand">&</div>
-      Nadya
-    </h1>
+    <h2 class="section-title">
+      Guest Book
+    </h2>
 
-    <div class="date">
-      25 · 10 · 2026
-    </div>
-
-    <p class="message">
-      Terima kasih telah menjadi bagian
-      dari hari bahagia kami.
+    <p class="section-subtitle">
+      Tinggalkan ucapan & doa terbaik
     </p>
 
-    <a href="#" class="button">
-      Isi Guest Book
-    </a>
+  </div>
 
-    <div class="brand">
-      D'GUESTBOOK
+  <div id="formArea" class="form-box">
+
+    <form id="guestForm">
+
+      <label for="guestName">
+        Nama Anda
+      </label>
+
+      <input
+        type="text"
+        id="guestName"
+        placeholder="Masukkan nama"
+        required
+      >
+
+      <label for="guestMessage">
+        Ucapan & Doa
+      </label>
+
+      <textarea
+        id="guestMessage"
+        placeholder="Tuliskan ucapan terbaik untuk Cikal & Nadya..."
+        required
+      ></textarea>
+
+      <button type="submit" class="submit">
+        KIRIM UCAPAN
+      </button>
+
+    </form>
+
+  </div>
+
+  <div id="success" class="success">
+
+    <div class="success-icon">
+      ♡
     </div>
 
-  </section>
+    <h3>
+      Terima kasih
+    </h3>
+
+    <p>
+      Ucapan dan doa terbaik Anda<br>
+      sangat berarti bagi kami.
+    </p>
+
+  </div>
+
+  <button class="back" onclick="showHome()">
+    ← Kembali ke halaman utama
+  </button>
+
+  <div class="guest-wall">
+
+    <div class="section-header">
+      <h2 class="section-title">
+        Ucapan Tamu
+      </h2>
+    </div>
+
+    <div id="guestList"></div>
+
+  </div>
+
+  <div class="footer">
+    D'GUESTBOOK
+  </div>
+
+</section>
+
+
+<script>
+
+function showGuestBook() {
+  document.getElementById("home").style.display = "none";
+  document.getElementById("guestbook").classList.add("active");
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+function showHome() {
+  document.getElementById("guestbook").classList.remove("active");
+  document.getElementById("home").style.display = "flex";
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+
+const form = document.getElementById("guestForm");
+
+form.addEventListener("submit", function(event) {
+
+  event.preventDefault();
+
+  const name =
+    document.getElementById("guestName").value.trim();
+
+  const message =
+    document.getElementById("guestMessage").value.trim();
+
+  if (!name || !message) {
+    return;
+  }
+
+  const guest = {
+    name: name,
+    message: message,
+    time: new Date().toLocaleString("id-ID")
+  };
+
+  let guests =
+    JSON.parse(localStorage.getItem("dguestbook_guests")) || [];
+
+  guests.unshift(guest);
+
+  localStorage.setItem(
+    "dguestbook_guests",
+    JSON.stringify(guests)
+  );
+
+  form.reset();
+
+  document.getElementById("formArea").style.display = "none";
+
+  document.getElementById("success").classList.add("show");
+
+  loadGuests();
+
+});
+
+
+function loadGuests() {
+
+  const list =
+    document.getElementById("guestList");
+
+  let guests =
+    JSON.parse(localStorage.getItem("dguestbook_guests")) || [];
+
+  if (guests.length === 0) {
+
+    list.innerHTML = `
+      <div class="empty">
+        Belum ada ucapan.
+        Jadilah yang pertama memberikan ucapan ❤️
+      </div>
+    `;
+
+    return;
+  }
+
+  list.innerHTML = "";
+
+  guests.forEach(function(guest) {
+
+    const card =
+      document.createElement("div");
+
+    card.className = "guest-card";
+
+    card.innerHTML = `
+      <div class="guest-name">
+        ${escapeHTML(guest.name)}
+      </div>
+
+      <div class="guest-message">
+        ${escapeHTML(guest.message)}
+      </div>
+
+      <div class="guest-time">
+        ${guest.time}
+      </div>
+    `;
+
+    list.appendChild(card);
+
+  });
+
+}
+
+
+function escapeHTML(text) {
+
+  const div = document.createElement("div");
+
+  div.textContent = text;
+
+  return div.innerHTML;
+
+}
+
+
+loadGuests();
+
+</script>
 
 </body>
 </html>
