@@ -440,8 +440,15 @@ textarea {
 
 </section>
 
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  const SUPABASE_URL = "https://yeyckoekpqadrbvmetta.supabase.co;
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_gMXd17AurWlX-OSSyqd-oA_rtkugfSN;
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
 
 function showGuestBook() {
   document.getElementById("home").style.display = "none";
