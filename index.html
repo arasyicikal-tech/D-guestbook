@@ -442,8 +442,8 @@ textarea {
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const SUPABASE_URL = "https://yeyckoekpqadrbvmetta.supabase.co;
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_gMXd17AurWlX-OSSyqd-oA_rtkugfSN;
+  const SUPABASE_URL = "https://yeyckoekpqadrbvmetta.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_gMXd17AurWlX-OSSyqd-oA_rtkugfSN";
 
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
@@ -473,7 +473,7 @@ function showHome() {
 
 const form = document.getElementById("guestForm");
 
-form.addEventListener("submit", function(event) {
+form.addEventListener("submit", async function(event) {
 
   event.preventDefault();
 
@@ -487,21 +487,19 @@ form.addEventListener("submit", function(event) {
     return;
   }
 
-  const guest = {
-    name: name,
+  const { error } = await supabaseClient
+  .from("messages")
+  .insert({
+    guest_name: name,
     message: message,
-    time: new Date().toLocaleString("id-ID")
-  };
+    is_approved: false
+  });
 
-  let guests =
-    JSON.parse(localStorage.getItem("dguestbook_guests")) || [];
-
-  guests.unshift(guest);
-
-  localStorage.setItem(
-    "dguestbook_guests",
-    JSON.stringify(guests)
-  );
+if (error) {
+  alert("Ucapan gagal dikirim. Silakan coba lagi.");
+  console.error(error);
+  return;
+}
 
   form.reset();
 
@@ -514,53 +512,61 @@ form.addEventListener("submit", function(event) {
 });
 
 
-function loadGuests() {
+async function loadGuests() {
+  const list = document.getElementById("guestList");
 
-  const list =
-    document.getElementById("guestList");
+  const { data: guests, error } = await supabaseClient
+    .from("messages")
+    .select("guest_name, message, created_at")
+    .eq("is_approved", true)
+    .order("created_at", { ascending: false });
 
-  let guests =
-    JSON.parse(localStorage.getItem("dguestbook_guests")) || [];
-
-  if (guests.length === 0) {
-
+  if (error) {
+    console.error(error);
     list.innerHTML = `
       <div class="empty">
         Belum ada ucapan.
+      </div>
+    `;
+    return;
+  }
+
+  if (!guests || guests.length === 0) {
+    list.innerHTML = `
+      <div class="empty">
+        Belum ada ucapan.
+        <br>
         Jadilah yang pertama memberikan ucapan ❤️
       </div>
     `;
-
     return;
   }
 
   list.innerHTML = "";
 
   guests.forEach(function(guest) {
-
-    const card =
-      document.createElement("div");
+    const card = document.createElement("div");
 
     card.className = "guest-card";
 
+    const time = new Date(guest.created_at).toLocaleString("id-ID");
+
     card.innerHTML = `
       <div class="guest-name">
-        ${escapeHTML(guest.name)}
+        ${escapeHTML(guest.guest_name || "")}
       </div>
 
       <div class="guest-message">
-        ${escapeHTML(guest.message)}
+        ${escapeHTML(guest.message || "")}
       </div>
 
       <div class="guest-time">
-        ${guest.time}
+        ${time}
       </div>
     `;
 
     list.appendChild(card);
-
   });
-
 }
 
 
