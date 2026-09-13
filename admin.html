@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D'Guestbook – Admin</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Georgia, serif;
+      background: #f7f4ef;
+      color: #3f3731;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .card {
+      background: #fffdf9;
+      border: 1px solid #ddd4ca;
+      padding: 36px 28px;
+    }
+
+    .brand {
+      text-align: center;
+      letter-spacing: 6px;
+      font-size: 14px;
+      color: #8b8178;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 34px;
+      font-weight: normal;
+      margin: 0 0 30px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      letter-spacing: 2px;
+      font-size: 12px;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      border: 1px solid #cfc5bb;
+      background: white;
+      font-size: 16px;
+      margin-bottom: 18px;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      background: #3f3731;
+      color: white;
+      font-size: 14px;
+      letter-spacing: 3px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+    }
+
+    .error {
+      color: #a33a32;
+      text-align: center;
+      margin-top: 18px;
+      font-size: 14px;
+    }
+
+    .success {
+      color: #55704f;
+      text-align: center;
+      margin-top: 18px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="card">
+
+      <div class="brand">D'GUESTBOOK</div>
+
+      <h1>Admin Login</h1>
+
+      <form id="loginForm">
+
+        <label for="email">EMAIL</label>
+        <input
+          type="email"
+          id="email"
+          placeholder="Masukkan email"
+          required
+        >
+
+        <label for="password">PASSWORD</label>
+        <input
+          type="password"
+          id="password"
+          placeholder="Masukkan password"
+          required
+        >
+
+        <button type="submit" id="loginButton">
+          LOGIN
+        </button>
+
+      </form>
+
+      <div id="message"></div>
+
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://yeyckoekpqadrbvmetta.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_gMXd17AurWlX-OSSyqd-oA_rtkugfSN";
+
+
+    const supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
+
+    const form = document.getElementById("loginForm");
+    const button = document.getElementById("loginButton");
+    const message = document.getElementById("message");
+
+    form.addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      button.disabled = true;
+      button.textContent = "LOGIN...";
+
+      message.className = "";
+      message.textContent = "";
+
+      const { data, error } =
+        await supabaseClient.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+      if (error) {
+        message.className = "error";
+        message.textContent = "Email atau password salah.";
+        button.disabled = false;
+        button.textContent = "LOGIN";
+        return;
+      }
+
+      const { data: adminStatus, error: adminError } =
+        await supabaseClient.rpc("is_admin");
+
+      if (adminError || adminStatus !== true) {
+        await supabaseClient.auth.signOut();
+
+        message.className = "error";
+        message.textContent = "Akun ini bukan admin.";
+        button.disabled = false;
+        button.textContent = "LOGIN";
+        return;
+      }
+
+      message.className = "success";
+      message.textContent = "Login berhasil.";
+
+      setTimeout(function() {
+        window.location.href = "admin-dashboard.html";
+      }, 700);
+    });
+  </script>
+
+</body>
+</html>
