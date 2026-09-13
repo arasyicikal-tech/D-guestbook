@@ -582,7 +582,442 @@ function escapeHTML(text) {
 
 
 loadGuests();
+/* =========================
+   D'GUESTBOOK ADMIN
+   ========================= */
 
+if (new URLSearchParams(window.location.search).has("admin")) {
+
+  document.body.innerHTML = `
+    <div id="adminApp" style="
+      min-height:100vh;
+      padding:30px 20px;
+      background:#f7f4ef;
+      color:#3f3731;
+      font-family:Georgia,serif;
+    ">
+      <div style="max-width:800px;margin:auto;">
+
+        <div style="text-align:center;margin-bottom:30px;">
+          <div style="
+            letter-spacing:5px;
+            font-size:13px;
+            color:#8b8178;
+            margin-bottom:10px;
+          ">D'GUESTBOOK</div>
+
+          <h1 style="
+            font-weight:normal;
+            margin:0;
+            font-size:32px;
+          ">Admin Panel</h1>
+        </div>
+
+        <div id="adminContent"></div>
+
+      </div>
+    </div>
+  `;
+
+  const adminContent = document.getElementById("adminContent");
+
+  function showLogin() {
+    adminContent.innerHTML = `
+      <div style="
+        background:#fffdf9;
+        border:1px solid #ddd4ca;
+        padding:30px 24px;
+        max-width:480px;
+        margin:auto;
+      ">
+
+        <h2 style="
+          font-weight:normal;
+          text-align:center;
+          margin-top:0;
+        ">Admin Login</h2>
+
+        <label style="
+          display:block;
+          font-size:12px;
+          letter-spacing:2px;
+          margin-bottom:8px;
+        ">EMAIL</label>
+
+        <input
+          id="adminEmail"
+          type="email"
+          placeholder="Masukkan email"
+          style="
+            width:100%;
+            padding:14px;
+            box-sizing:border-box;
+            margin-bottom:18px;
+            border:1px solid #cfc5bb;
+            font-size:16px;
+          "
+        >
+
+        <label style="
+          display:block;
+          font-size:12px;
+          letter-spacing:2px;
+          margin-bottom:8px;
+        ">PASSWORD</label>
+
+        <input
+          id="adminPassword"
+          type="password"
+          placeholder="Masukkan password"
+          style="
+            width:100%;
+            padding:14px;
+            box-sizing:border-box;
+            margin-bottom:20px;
+            border:1px solid #cfc5bb;
+            font-size:16px;
+          "
+        >
+
+        <button
+          id="adminLoginButton"
+          style="
+            width:100%;
+            padding:15px;
+            border:0;
+            background:#3f3731;
+            color:white;
+            letter-spacing:2px;
+            font-size:14px;
+          "
+        >
+          LOGIN
+        </button>
+
+        <div
+          id="adminLoginMessage"
+          style="
+            text-align:center;
+            margin-top:15px;
+            font-size:14px;
+          "
+        ></div>
+
+      </div>
+    `;
+
+    document
+      .getElementById("adminLoginButton")
+      .addEventListener("click", adminLogin);
+  }
+
+  async function adminLogin() {
+
+    const email = document
+      .getElementById("adminEmail")
+      .value
+      .trim();
+
+    const password = document
+      .getElementById("adminPassword")
+      .value;
+
+    const button = document.getElementById("adminLoginButton");
+    const message = document.getElementById("adminLoginMessage");
+
+    if (!email || !password) {
+      message.textContent = "Email dan password wajib diisi.";
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = "LOGIN...";
+
+    const { error } =
+      await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+    if (error) {
+      message.textContent = "Email atau password salah.";
+      button.disabled = false;
+      button.textContent = "LOGIN";
+      return;
+    }
+
+    const { data: adminStatus, error: adminError } =
+      await supabaseClient.rpc("is_admin");
+
+    if (adminError || adminStatus !== true) {
+
+      await supabaseClient.auth.signOut();
+
+      message.textContent = "Akun ini bukan admin.";
+      button.disabled = false;
+      button.textContent = "LOGIN";
+
+      return;
+    }
+
+    loadAdminDashboard();
+  }
+
+  async function loadAdminDashboard() {
+
+    adminContent.innerHTML = `
+      <div style="text-align:center;padding:30px;">
+        Memuat ucapan...
+      </div>
+    `;
+
+    const { data: guests, error } =
+      await supabaseClient
+        .from("messages")
+        .select("*")
+        .order("created_at", { ascending:false });
+
+    if (error) {
+      adminContent.innerHTML = `
+        <div style="
+          background:#fffdf9;
+          padding:25px;
+          text-align:center;
+        ">
+          Gagal mengambil data ucapan.
+        </div>
+      `;
+      console.error(error);
+      return;
+    }
+
+    let html = `
+
+      <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:20px;
+        gap:10px;
+      ">
+
+        <h2 style="
+          font-weight:normal;
+          margin:0;
+        ">
+          Ucapan Tamu
+        </h2>
+
+        <button
+          id="adminLogout"
+          style="
+            padding:10px 15px;
+            border:1px solid #3f3731;
+            background:white;
+            color:#3f3731;
+          "
+        >
+          Logout
+        </button>
+
+      </div>
+    `;
+
+    if (!guests || guests.length === 0) {
+
+      html += `
+        <div style="
+          background:#fffdf9;
+          border:1px solid #ddd4ca;
+          padding:30px;
+          text-align:center;
+        ">
+          Belum ada ucapan.
+        </div>
+      `;
+
+    } else {
+
+      guests.forEach(function(guest) {
+
+        const approved = guest.is_approved === true;
+
+        const time = guest.created_at
+          ? new Date(guest.created_at).toLocaleString("id-ID")
+          : "";
+
+        html += `
+
+          <div style="
+            background:#fffdf9;
+            border:1px solid #ddd4ca;
+            padding:22px;
+            margin-bottom:15px;
+          ">
+
+            <div style="
+              font-size:18px;
+              margin-bottom:8px;
+              font-weight:bold;
+            ">
+              ${escapeHTML(guest.guest_name || "")}
+            </div>
+
+            <div style="
+              line-height:1.6;
+              margin-bottom:10px;
+            ">
+              ${escapeHTML(guest.message || "")}
+            </div>
+
+            <div style="
+              font-size:12px;
+              color:#8b8178;
+              margin-bottom:15px;
+            ">
+              ${time}
+            </div>
+
+            <div style="
+              margin-bottom:15px;
+              font-size:13px;
+            ">
+              Status:
+              <strong>
+                ${approved ? "APPROVED ✅" : "PENDING ⏳"}
+              </strong>
+            </div>
+
+            <div style="
+              display:flex;
+              gap:10px;
+              flex-wrap:wrap;
+            ">
+
+              ${
+                !approved
+                ? `
+                  <button
+                    onclick="approveGuest(${guest.id})"
+                    style="
+                      padding:11px 16px;
+                      border:0;
+                      background:#55704f;
+                      color:white;
+                    "
+                  >
+                    APPROVE
+                  </button>
+                `
+                : ""
+              }
+
+              <button
+                onclick="deleteGuest(${guest.id})"
+                style="
+                  padding:11px 16px;
+                  border:0;
+                  background:#a33a32;
+                  color:white;
+                "
+              >
+                HAPUS
+              </button>
+
+            </div>
+
+          </div>
+        `;
+      });
+    }
+
+    adminContent.innerHTML = html;
+
+    document
+      .getElementById("adminLogout")
+      .addEventListener("click", async function() {
+
+        await supabaseClient.auth.signOut();
+
+        showLogin();
+
+      });
+  }
+
+  window.approveGuest = async function(id) {
+
+    const { error } =
+      await supabaseClient
+        .from("messages")
+        .update({
+          is_approved:true
+        })
+        .eq("id", id);
+
+    if (error) {
+
+      alert("Gagal approve ucapan.");
+      console.error(error);
+
+      return;
+    }
+
+    loadAdminDashboard();
+  };
+
+  window.deleteGuest = async function(id) {
+
+    const yakin = confirm(
+      "Yakin ingin menghapus ucapan ini?"
+    );
+
+    if (!yakin) return;
+
+    const { error } =
+      await supabaseClient
+        .from("messages")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+
+      alert("Gagal menghapus ucapan.");
+      console.error(error);
+
+      return;
+    }
+
+    loadAdminDashboard();
+  };
+
+  async function checkAdminSession() {
+
+    const { data } =
+      await supabaseClient.auth.getSession();
+
+    if (!data.session) {
+
+      showLogin();
+      return;
+    }
+
+    const { data: adminStatus } =
+      await supabaseClient.rpc("is_admin");
+
+    if (adminStatus === true) {
+
+      loadAdminDashboard();
+
+    } else {
+
+      await supabaseClient.auth.signOut();
+
+      showLogin();
+    }
+  }
+
+  checkAdminSession();
+}
 </script>
 
 </body>
