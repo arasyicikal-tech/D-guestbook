@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>D’Guestbook — Admin Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f6f3ef;
+  color: #3f3832;
+}
+
+header {
+  background: #3f3832;
+  color: white;
+  padding: 20px;
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.logo {
+  font-size: 22px;
+  letter-spacing: 4px;
+}
+
+.logout {
+  border: 1px solid rgba(255,255,255,.5);
+  background: transparent;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 0 18px;
+}
+
+h1 {
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  color: #8a7e73;
+  margin-top: 0;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin: 25px 0;
+}
+
+.stat {
+  background: white;
+  border: 1px solid #ddd5cd;
+  padding: 22px;
+  border-radius: 10px;
+}
+
+.stat-label {
+  color: #8a7e73;
+  font-size: 14px;
+}
+
+.stat-number {
+  font-size: 32px;
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 25px 0 15px;
+  gap: 10px;
+}
+
+.refresh {
+  border: 1px solid #8a7e73;
+  background: white;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.message-card {
+  background: white;
+  border: 1px solid #ddd5cd;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 15px;
+}
+
+.message-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.guest-name {
+  font-size: 19px;
+  font-weight: bold;
+}
+
+.status {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.pending {
+  background: #f3e4c7;
+  color: #76551e;
+}
+
+.approved {
+  background: #dcebdc;
+  color: #355d35;
+}
+
+.message-text {
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 15px 0;
+}
+
+.meta {
+  color: #9b9189;
+  font-size: 13px;
+}
+
+.actions {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.approve {
+  background: #3f3832;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.delete {
+  background: white;
+  color: #9b3333;
+  border: 1px solid #c88;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.empty {
+  background: white;
+  border: 1px solid #ddd5cd;
+  padding: 30px;
+  text-align: center;
+  color: #8a7e73;
+}
+
+.loading {
+  text-align: center;
+  padding: 30px;
+  color: #8a7e73;
+}
+
+.error {
+  background: #f8dddd;
+  color: #7b2222;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 650px) {
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .header-inner {
+    align-items: flex-start;
+  }
+
+  .logo {
+    font-size: 17px;
+  }
+
+  .message-top {
+    flex-direction: column;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">D’GUESTBOOK ADMIN</div>
+    <button class="logout" onclick="logout()">Logout</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <h1>Admin Dashboard</h1>
+  <p class="subtitle">
+    Kelola ucapan tamu D’Guestbook
+  </p>
+
+  <div id="errorBox"></div>
+
+  <div class="stats">
+
+    <div class="stat">
+      <div class="stat-label">Total Ucapan</div>
+      <div class="stat-number" id="totalCount">0</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-label">Menunggu Approval</div>
+      <div class="stat-number" id="pendingCount">0</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-label">Sudah Tampil</div>
+      <div class="stat-number" id="approvedCount">0</div>
+    </div>
+
+  </div>
+
+  <div class="toolbar">
+    <h2>Ucapan Tamu</h2>
+    <button class="refresh" onclick="loadMessages()">
+      ↻ Refresh
+    </button>
+  </div>
+
+  <div id="messageList" class="loading">
+    Memuat data...
+  </div>
+
+</div>
+
+<script>
+
+const SUPABASE_URL = "https://yeyckoekpqadrbvmetta.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_gMXd17AurWlX-OSSyqd-oA_rtkugfSN";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
+
+// ============================
+// CEK SESSION & ADMIN
+// ============================
+
+async function checkAdmin() {
+
+  const {
+    data: { session }
+  } = await supabaseClient.auth.getSession();
+
+  if (!session) {
+    window.location.href = "admin.html";
+    return false;
+  }
+
+  const { data: isAdmin, error } =
+    await supabaseClient.rpc("is_admin");
+
+  if (error || !isAdmin) {
+    alert("Akses ditolak. Anda bukan admin.");
+    await supabaseClient.auth.signOut();
+    window.location.href = "admin.html";
+    return false;
+  }
+
+  return true;
+}
+
+
+// ============================
+// LOAD MESSAGES
+// ============================
+
+async function loadMessages() {
+
+  const list = document.getElementById("messageList");
+
+  list.innerHTML =
+    '<div class="loading">Memuat ucapan...</div>';
+
+  const { data: messages, error } =
+    await supabaseClient
+      .from("messages")
+      .select("*")
+      .order("created_at", {
+        ascending: false
+      });
+
+  if (error) {
+
+    document.getElementById("errorBox").innerHTML =
+      '<div class="error">' +
+      escapeHTML(error.message) +
+      '</div>';
+
+    list.innerHTML = "";
+    return;
+  }
+
+  document.getElementById("errorBox").innerHTML = "";
+
+  updateStats(messages);
+
+  if (!messages || messages.length === 0) {
+
+    list.innerHTML =
+      '<div class="empty">Belum ada ucapan tamu.</div>';
+
+    return;
+  }
+
+  list.innerHTML = messages.map(message => {
+
+    const isApproved = message.is_approved === true;
+
+    const statusClass =
+      isApproved ? "approved" : "pending";
+
+    const statusText =
+      isApproved ? "Approved" : "Menunggu Approval";
+
+    const date = message.created_at
+      ? new Date(message.created_at).toLocaleString("id-ID")
+      : "-";
+
+    return `
+
+      <div class="message-card">
+
+        <div class="message-top">
+
+          <div class="guest-name">
+            ${escapeHTML(message.guest_name || "Tanpa Nama")}
+          </div>
+
+          <div class="status ${statusClass}">
+            ${statusText}
+          </div>
+
+        </div>
+
+        <div class="message-text">
+          ${escapeHTML(message.message || "")}
+        </div>
+
+        <div class="meta">
+          Wedding ID: ${message.wedding_id || "-"}
+          · ${date}
+        </div>
+
+        <div class="actions">
+
+          ${
+            !isApproved
+              ? `
+                <button
+                  class="approve"
+                  onclick="approveMessage(${message.id})">
+                  ✓ Approve
+                </button>
+              `
+              : ""
+          }
+
+          <button
+            class="delete"
+            onclick="deleteMessage(${message.id})">
+            🗑 Hapus
+          </button>
+
+        </div>
+
+      </div>
+
+    `;
+
+  }).join("");
+}
+
+
+// ============================
+// STATISTICS
+// ============================
+
+function updateStats(messages) {
+
+  const total = messages.length;
+
+  const pending =
+    messages.filter(
+      item => item.is_approved !== true
+    ).length;
+
+  const approved =
+    messages.filter(
+      item => item.is_approved === true
+    ).length;
+
+  document.getElementById("totalCount").textContent =
+    total;
+
+  document.getElementById("pendingCount").textContent =
+    pending;
+
+  document.getElementById("approvedCount").textContent =
+    approved;
+}
+
+
+// ============================
+// APPROVE
+// ============================
+
+async function approveMessage(id) {
+
+  const confirmApprove =
+    confirm("Approve ucapan ini agar tampil di website?");
+
+  if (!confirmApprove) return;
+
+  const { error } =
+    await supabaseClient
+      .from("messages")
+      .update({
+        is_approved: true
+      })
+      .eq("id", id);
+
+  if (error) {
+
+    alert(
+      "Gagal approve: " +
+      error.message
+    );
+
+    return;
+  }
+
+  await loadMessages();
+}
+
+
+// ============================
+// DELETE
+// ============================
+
+async function deleteMessage(id) {
+
+  const confirmDelete =
+    confirm("Yakin ingin menghapus ucapan ini?");
+
+  if (!confirmDelete) return;
+
+  const { error } =
+    await supabaseClient
+      .from("messages")
+      .delete()
+      .eq("id", id);
+
+  if (error) {
+
+    alert(
+      "Gagal menghapus: " +
+      error.message
+    );
+
+    return;
+  }
+
+  await loadMessages();
+}
+
+
+// ============================
+// LOGOUT
+// ============================
+
+async function logout() {
+
+  await supabaseClient.auth.signOut();
+
+  window.location.href = "admin.html";
+}
+
+
+// ============================
+// SECURITY
+// ============================
+
+function escapeHTML(text) {
+
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+// ============================
+// START
+// ============================
+
+(async function() {
+
+  const allowed = await checkAdmin();
+
+  if (allowed) {
+    await loadMessages();
+  }
+
+})();
+
+</script>
+
+</body>
+</html>
