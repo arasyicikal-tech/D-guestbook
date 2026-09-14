@@ -449,16 +449,28 @@ const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY
 );
-async function loadWeddingData() {
-  const params = new URLSearchParams(window.location.search);
-  const weddingId = params.get("wedding");
+let currentWeddingId = 1;
 
-  if (!weddingId) return;
+async function loadWeddingData() {
+  const hashParams = new URLSearchParams(
+    window.location.hash.replace("#", "")
+  );
+
+  const queryParams = new URLSearchParams(
+    window.location.search
+  );
+
+  const weddingId =
+    hashParams.get("wedding") ||
+    queryParams.get("wedding") ||
+    "1";
+
+  currentWeddingId = Number(weddingId);
 
   const { data, error } = await supabaseClient
     .from("Weddings")
     .select("*")
-    .eq("id", weddingId)
+    .eq("id", currentWeddingId)
     .single();
 
   if (error || !data) {
@@ -466,16 +478,18 @@ async function loadWeddingData() {
     return;
   }
 
-  document.title = `D'Guestbook – ${data.bride_name} & ${data.groom_name}`;
+  document.title =
+    `D'Guestbook – ${data.bride_name} & ${data.groom_name}`;
 
   const titleElement = document.querySelector(".names");
 
-if (titleElement) {
-  titleElement.innerHTML = `
-    ${data.bride_name || ""}
-    <div class="ampersand">&</div>
-    ${data.groom_name || ""}
-  `;
+  if (titleElement) {
+    titleElement.innerHTML = `
+      ${data.bride_name || ""}
+      <div class="ampersand">&</div>
+      ${data.groom_name || ""}
+    `;
+  }
 }
   loadWeddingData();
 function showGuestBook() {
