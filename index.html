@@ -520,6 +520,7 @@ async function loadGuests() {
     .from("messages")
     .select("guest_name, message, created_at")
     .eq("is_approved", true)
+    .eq("wedding_id",1)
     .order("created_at", { ascending: false });
 
   if (error) {
