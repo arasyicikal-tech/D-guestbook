@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>D'Guestbook</title>
+</head>
+<body>
+<script>
+  history.replaceState(null, "", "wedding-2.html?wedding=2");
+
+  fetch("index.html")
+    .then(response => response.text())
+    .then(html => {
+      document.open();
+      document.write(html);
+      document.close();
+    })
+    .catch(error => {
+      document.body.innerHTML = "<h2>Gagal memuat D'Guestbook</h2>";
+      console.error(error);
+    });
+</script>
+</body>
+</html>
