@@ -477,6 +477,7 @@ async function loadWeddingData() {
     titleElements[1].textContent = data.groom_name || "";
   }
 }
+  loadWeddingData();
 function showGuestBook() {
   document.getElementById("home").style.display = "none";
   document.getElementById("guestbook").classList.add("active");
