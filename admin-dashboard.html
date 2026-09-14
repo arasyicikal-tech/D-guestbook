@@ -242,7 +242,100 @@ h1 {
   <p class="subtitle">
     Kelola ucapan tamu D’Guestbook
   </p>
+<!-- ============================
+     MANAJEMEN WEDDING
+============================= -->
 
+<div style="margin-top:35px;">
+
+  <div style="
+    background:white;
+    border:1px solid #ddd5cd;
+    border-radius:10px;
+    padding:24px;
+  ">
+
+    <h2 style="margin-top:0;">
+      Manajemen Wedding
+    </h2>
+
+    <p style="color:#8a7e73;">
+      Kelola data pasangan yang menggunakan D’Guestbook.
+    </p>
+
+    <div style="
+      display:grid;
+      gap:12px;
+      margin-top:20px;
+    ">
+
+      <input
+        id="weddingBride"
+        type="text"
+        placeholder="Nama Pengantin Wanita"
+        style="
+          padding:14px;
+          border:1px solid #ccc;
+          border-radius:6px;
+          font-size:16px;
+        "
+      >
+
+      <input
+        id="weddingGroom"
+        type="text"
+        placeholder="Nama Pengantin Pria"
+        style="
+          padding:14px;
+          border:1px solid #ccc;
+          border-radius:6px;
+          font-size:16px;
+        "
+      >
+
+      <input
+        id="weddingDate"
+        type="date"
+        style="
+          padding:14px;
+          border:1px solid #ccc;
+          border-radius:6px;
+          font-size:16px;
+        "
+      >
+
+      <input
+        id="weddingVenue"
+        type="text"
+        placeholder="Venue / Lokasi Wedding"
+        style="
+          padding:14px;
+          border:1px solid #ccc;
+          border-radius:6px;
+          font-size:16px;
+        "
+      >
+
+      <button
+        onclick="createWedding()"
+        style="
+          padding:14px;
+          border:0;
+          border-radius:6px;
+          background:#3f3832;
+          color:white;
+          font-size:16px;
+          cursor:pointer;
+        "
+      >
+        + Tambah Wedding
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
   <div id="errorBox"></div>
 
   <div class="stats">
@@ -561,7 +654,49 @@ function escapeHTML(text) {
   }
 
 })();
+async function createWedding() {
 
+  const bride = document.getElementById("weddingBride").value.trim();
+  const groom = document.getElementById("weddingGroom").value.trim();
+  const date = document.getElementById("weddingDate").value;
+  const venue = document.getElementById("weddingVenue").value.trim();
+
+  if (!bride || !groom) {
+    alert("Nama pengantin wajib diisi.");
+    return;
+  }
+
+  const slug = (
+    bride + "-" + groom
+  )
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  const { error } = await supabaseClient
+    .from("Weddings")
+    .insert({
+      bride_name: bride,
+      groom_name: groom,
+      slug: slug,
+      wedding_date: date || null,
+      venue: venue || null,
+      template: "classic",
+      status: "active"
+    });
+
+  if (error) {
+    alert("Gagal membuat wedding: " + error.message);
+    return;
+  }
+
+  alert("Wedding berhasil ditambahkan!");
+
+  document.getElementById("weddingBride").value = "";
+  document.getElementById("weddingGroom").value = "";
+  document.getElementById("weddingDate").value = "";
+  document.getElementById("weddingVenue").value = "";
+}
 </script>
 
 </body>
