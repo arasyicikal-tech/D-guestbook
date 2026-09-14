@@ -384,6 +384,153 @@ textarea:focus {
     padding: 18px;
   }
 }
+  /* ===== PREMIUM GUESTBOOK V2 ===== */
+
+body {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,0.95), transparent 45%),
+    #f5f1eb;
+}
+
+/* Judul */
+h1,
+h2,
+h3,
+.section-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  letter-spacing: 1px;
+}
+
+.names {
+  text-transform: uppercase;
+}
+
+/* Form Guestbook */
+#guestForm {
+  max-width: 720px;
+  margin: 40px auto;
+  padding: 45px 42px;
+  background: rgba(255,255,255,0.82);
+  border: 1px solid rgba(120,105,90,0.18);
+  box-shadow: 0 20px 60px rgba(60,45,30,0.08);
+}
+
+/* Label */
+#guestForm label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 13px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+/* Input & textarea */
+#guestForm input,
+#guestForm textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: #fffdf9;
+  border: 1px solid #d8d0c6;
+  border-radius: 0;
+  padding: 17px 18px;
+  margin-bottom: 28px;
+  font-size: 16px;
+  color: #403831;
+}
+
+#guestForm textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+#guestForm input::placeholder,
+#guestForm textarea::placeholder {
+  color: #aaa29a;
+}
+
+/* Tombol */
+#guestForm button {
+  width: 100%;
+  padding: 18px;
+  border: none;
+  border-radius: 0;
+  background: #403831;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+#guestForm button:hover {
+  background: #574d44;
+  transform: translateY(-2px);
+}
+
+/* Area ucapan */
+#guestList {
+  max-width: 900px;
+  margin: 50px auto;
+}
+
+/* Card ucapan */
+#guestList .guest-card {
+  background: rgba(255,255,255,0.88);
+  border: 1px solid #ded7cf;
+  border-radius: 0;
+  padding: 30px 32px;
+  margin-bottom: 20px;
+  box-shadow: 0 12px 35px rgba(60,45,30,0.06);
+}
+
+/* Nama tamu */
+#guestList .guest-name {
+  font-family: Georgia, serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: #403831;
+}
+
+/* Isi ucapan */
+#guestList .guest-message {
+  margin-top: 12px;
+  font-family: Georgia, serif;
+  font-size: 16px;
+  line-height: 1.8;
+  color: #665d55;
+}
+
+/* Waktu */
+#guestList .guest-time {
+  margin-top: 15px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: #aaa19a;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+
+  #guestForm {
+    margin: 25px 16px;
+    padding: 32px 22px;
+  }
+
+  #guestList {
+    margin: 35px 16px;
+  }
+
+  #guestList .guest-card {
+    padding: 24px 22px;
+  }
+
+  #guestList .guest-name {
+    font-size: 20px;
+  }
+}
 </style>
 </head>
 
