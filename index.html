@@ -468,14 +468,16 @@ async function loadWeddingData() {
 
   document.title = `D'Guestbook – ${data.bride_name} & ${data.groom_name}`;
 
-  const titleElements = document.querySelectorAll(
-    ".bride-name, .groom-name"
-  );
+  const titleElements = document.querySelectorAll(".names");
 
-  if (titleElements.length >= 2) {
-    titleElements[0].textContent = data.bride_name || "";
-    titleElements[1].textContent = data.groom_name || "";
+if (titleElements.length > 0) {
+  const names = titleElements[0].childNodes;
+
+  if (names.length >= 3) {
+    names[0].textContent = data.bride_name || "";
+    names[2].textContent = data.groom_name || "";
   }
+}
 }
   loadWeddingData();
 function showGuestBook() {
