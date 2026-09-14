@@ -784,7 +784,7 @@ form.addEventListener("submit", async function(event) {
   const { error } = await supabaseClient
   .from("messages")
   .insert({
-    wedding_id: 1,
+    wedding_id: Number(new URLSearchParams(window.location.search).get("wedding")) || 1,
     guest_name: name,
     message: message,
     is_approved: false
