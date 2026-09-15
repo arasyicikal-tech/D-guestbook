@@ -698,6 +698,123 @@ async function createWedding() {
   document.getElementById("weddingVenue").value = "";
 }
 </script>
+<!-- ===== QR CODE WEDDING ===== -->
 
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+<div id="qrWeddingSection" style="
+  margin-top:40px;
+  background:white;
+  border:1px solid #ddd5cd;
+  border-radius:12px;
+  padding:24px;
+">
+
+  <h2>QR Code Wedding</h2>
+
+  <p style="color:#8a7e73;">
+    Buat QR Code khusus untuk setiap pasangan.
+  </p>
+
+  <div id="qrWeddingList"></div>
+
+</div>
+
+<script>
+async function loadWeddingQR() {
+
+  const { data, error } = await supabaseClient
+    .from("Weddings")
+    .select("id, bride_name, groom_name")
+    .order("id", { ascending: true });
+
+  const container = document.getElementById("qrWeddingList");
+
+  if (error) {
+    container.innerHTML = "<p>Gagal memuat wedding.</p>";
+    return;
+  }
+
+  container.innerHTML = "";
+
+  data.forEach(wedding => {
+
+    const card = document.createElement("div");
+
+    card.style.cssText = `
+      border:1px solid #ddd5cd;
+      border-radius:10px;
+      padding:20px;
+      margin-top:16px;
+      text-align:center;
+    `;
+
+    const title = document.createElement("h3");
+    title.textContent =
+      wedding.bride_name + " & " + wedding.groom_name;
+
+    const qrBox = document.createElement("div");
+
+    qrBox.style.cssText = `
+      display:flex;
+      justify-content:center;
+      margin:20px 0;
+    `;
+
+    const link = window.location.origin +
+      "/D-guestbook/wedding-" +
+      wedding.id +
+      ".html";
+
+    new QRCode(qrBox, {
+      text: link,
+      width: 180,
+      height: 180
+    });
+
+    const linkText = document.createElement("p");
+
+    linkText.style.cssText = `
+      font-size:13px;
+      word-break:break-all;
+      color:#777;
+    `;
+
+    linkText.textContent = link;
+
+    const copyButton = document.createElement("button");
+
+    copyButton.textContent = "Salin Link";
+
+    copyButton.style.cssText = `
+      padding:12px 20px;
+      border:0;
+      border-radius:8px;
+      cursor:pointer;
+      margin-top:8px;
+    `;
+
+    copyButton.onclick = async function() {
+
+      await navigator.clipboard.writeText(link);
+
+      copyButton.textContent = "✓ Link Tersalin";
+
+      setTimeout(() => {
+        copyButton.textContent = "Salin Link";
+      }, 2000);
+    };
+
+    card.appendChild(title);
+    card.appendChild(qrBox);
+    card.appendChild(linkText);
+    card.appendChild(copyButton);
+
+    container.appendChild(card);
+  });
+}
+
+loadWeddingQR();
+</script>
 </body>
 </html>
