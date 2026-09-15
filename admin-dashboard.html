@@ -762,9 +762,8 @@ async function loadWeddingQR() {
     `;
 
     const link = window.location.origin +
-      "/D-guestbook/wedding-" +
-      wedding.id +
-      ".html";
+"/D-guestbook/#wedding=" +
+wedding.id;
 
     new QRCode(qrBox, {
       text: link,
