@@ -607,7 +607,7 @@ section:has(#guestForm) {
   <div class="section-header">
 
     <div class="section-subtitle">
-      CIKAL & NADYA
+      <span id="weddingSubtitle"></span>
     </div>
 
     <h2 class="section-title">
@@ -742,6 +742,12 @@ async function loadWeddingData() {
       ${data.groom_name || ""}
     `;
   }
+  const subtitleElement = document.getElementById("weddingSubtitle");
+
+if (subtitleElement) {
+  subtitleElement.textContent =
+    `${data.bride_name || ""} & ${data.groom_name || ""}`;
+}
 }
   loadWeddingData();
 function showGuestBook() {
