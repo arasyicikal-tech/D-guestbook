@@ -685,7 +685,11 @@ section:has(#guestForm) {
     <div id="guestList"></div>
 
   </div>
-
+  <div id="qrSection" style="text-align:center; margin:60px 0;">
+  <h3>SCAN QR CODE</h3>
+  <div id="qrcode" style="display:inline-block;"></div>
+  <p>Scan untuk membuka Guest Book</p>
+</div>
   <div class="footer">
     D'GUESTBOOK
   </div>
@@ -755,6 +759,20 @@ if (messageElement) {
   messageElement.placeholder =
     `Tuliskan ucapan terbaik untuk ${data.bride_name || ""} & ${data.groom_name || ""}...`;
 }
+}
+  const qrElement = document.getElementById("qrcode");
+
+if (qrElement) {
+  qrElement.innerHTML = "";
+
+  const qrLink =
+    `${window.location.origin}${window.location.pathname}?wedding=${currentWeddingId}`;
+
+  new QRCode(qrElement, {
+    text: qrLink,
+    width: 200,
+    height: 200
+  });
 }
   loadWeddingData();
 function showGuestBook() {
