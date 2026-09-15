@@ -747,6 +747,14 @@ async function loadWeddingData() {
       ${data.groom_name || ""}
     `;
   }
+  const heroElement = document.querySelector(".hero");
+
+if (heroElement && data.cover_image) {
+  heroElement.style.backgroundImage =
+    `url("${data.cover_image}")`;
+  heroElement.style.backgroundSize = "cover";
+  heroElement.style.backgroundPosition = "center";
+}
   const subtitleElement = document.getElementById("weddingSubtitle");
 
 if (subtitleElement) {
