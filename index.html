@@ -641,7 +641,7 @@ section:has(#guestForm) {
 
       <textarea
         id="guestMessage"
-        placeholder="Tuliskan ucapan terbaik untuk Cikal & Nadya..."
+        placeholder="Tuliskan ucapan terbaik ..."
         required
       ></textarea>
 
@@ -747,6 +747,12 @@ async function loadWeddingData() {
 if (subtitleElement) {
   subtitleElement.textContent =
     `${data.bride_name || ""} & ${data.groom_name || ""}`;
+}
+  const messageElement = document.getElementById("guestMessage");
+
+if (messageElement) {
+  messageElement.placeholder =
+    `Tuliskan ucapan terbaik untuk ${data.bride_name || ""} & ${data.groom_name || ""}...`;
 }
 }
   loadWeddingData();
