@@ -335,6 +335,115 @@ h1 {
 
   </div>
 
+  <!-- ============================= -->
+<!-- MANAJEMEN TAMU -->
+<!-- ============================= -->
+
+<div style="
+  margin-top:35px;
+  background:white;
+  border:1px solid #d8c7a0;
+  border-radius:10px;
+  padding:24px;
+">
+
+  <h2 style="margin-top:0;">
+    Manajemen Tamu
+  </h2>
+
+  <p style="color:#8a7e73;">
+    Tambahkan data tamu dan buat QR Check-In masing-masing tamu.
+  </p>
+
+  <div style="
+    display:grid;
+    gap:12px;
+    margin-top:20px;
+  ">
+
+    <select
+      id="guestWedding"
+      style="
+        padding:14px;
+        border:1px solid #ccc;
+        border-radius:6px;
+        font-size:16px;
+      "
+    >
+      <option value="">Pilih Wedding</option>
+    </select>
+
+    <input
+      id="guestName"
+      type="text"
+      placeholder="Nama Tamu"
+      style="
+        padding:14px;
+        border:1px solid #ccc;
+        border-radius:6px;
+        font-size:16px;
+      "
+    >
+
+    <select
+      id="guestCategory"
+      style="
+        padding:14px;
+        border:1px solid #ccc;
+        border-radius:6px;
+        font-size:16px;
+      "
+    >
+      <option value="Regular">Regular</option>
+      <option value="VIP">VIP</option>
+    </select>
+
+    <input
+      id="guestCount"
+      type="number"
+      min="1"
+      value="1"
+      placeholder="Jumlah Tamu"
+      style="
+        padding:14px;
+        border:1px solid #ccc;
+        border-radius:6px;
+        font-size:16px;
+      "
+    >
+
+    <input
+      id="guestTable"
+      type="text"
+      placeholder="Nomor Meja (opsional)"
+      style="
+        padding:14px;
+        border:1px solid #ccc;
+        border-radius:6px;
+        font-size:16px;
+      "
+    >
+
+    <button
+      onclick="createGuest()"
+      style="
+        padding:14px;
+        border:0;
+        border-radius:6px;
+        background:#b08d4f;
+        color:white;
+        font-size:16px;
+        cursor:pointer;
+      "
+    >
+      + TAMBAH TAMU & BUAT QR
+    </button>
+
+  </div>
+
+  <div id="guestResult" style="margin-top:20px;"></div>
+
+</div>
 </div>
   <div id="errorBox"></div>
 
