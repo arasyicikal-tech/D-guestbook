@@ -1,0 +1,336 @@
+ <!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D’Manten Check-In</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Georgia, "Times New Roman", serif;
+      background: #f7f3ec;
+      color: #332b24;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+      text-align: center;
+    }
+
+    .brand {
+      font-size: 14px;
+      letter-spacing: 6px;
+      margin-bottom: 12px;
+    }
+
+    .gold-line {
+      width: 70px;
+      height: 1px;
+      background: #b08a4a;
+      margin: 0 auto 28px;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 400;
+      margin: 0 0 8px;
+      letter-spacing: 2px;
+    }
+
+    .subtitle {
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      color: #8a7760;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: #fffdf9;
+      border: 1px solid rgba(176,138,74,.35);
+      padding: 30px 24px;
+      box-shadow: 0 15px 45px rgba(70,55,35,.10);
+    }
+
+    .qr-icon {
+      font-size: 42px;
+      margin-bottom: 15px;
+    }
+
+    .scan-title {
+      font-size: 21px;
+      margin-bottom: 8px;
+    }
+
+    .scan-text {
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      color: #7d7063;
+      margin-bottom: 22px;
+    }
+
+    input {
+      width: 100%;
+      padding: 16px;
+      border: 1px solid #d7c8ae;
+      background: #fff;
+      font-size: 15px;
+      text-align: center;
+      outline: none;
+      margin-bottom: 12px;
+    }
+
+    input:focus {
+      border-color: #b08a4a;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      background: #b08a4a;
+      color: white;
+      font-size: 13px;
+      letter-spacing: 3px;
+      cursor: pointer;
+    }
+
+    button:active {
+      opacity: .8;
+    }
+
+    #result {
+      margin-top: 22px;
+      display: none;
+    }
+
+    .guest-card {
+      border-top: 1px solid #d7c8ae;
+      padding-top: 22px;
+    }
+
+    .guest-name {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .category {
+      display: inline-block;
+      padding: 6px 14px;
+      border: 1px solid #b08a4a;
+      color: #9a7438;
+      font-family: Arial, sans-serif;
+      font-size: 11px;
+      letter-spacing: 2px;
+      margin-bottom: 18px;
+    }
+
+    .info {
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.8;
+      color: #65594d;
+      margin-bottom: 20px;
+    }
+
+    .success {
+      color: #55704f;
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      margin-top: 15px;
+    }
+
+    .error {
+      color: #9b3d35;
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      margin-top: 15px;
+    }
+
+    .footer {
+      margin-top: 25px;
+      font-family: Arial, sans-serif;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: #9a8b78;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="brand">D’MANTEN</div>
+  <div class="gold-line"></div>
+
+  <h1>GUEST CHECK-IN</h1>
+
+  <div class="subtitle">
+    DIGITAL WEDDING REGISTRATION
+  </div>
+
+  <div class="card">
+
+    <div class="qr-icon">⌗</div>
+
+    <div class="scan-title">
+      Scan QR Tamu
+    </div>
+
+    <div class="scan-text">
+      Masukkan kode QR tamu untuk melakukan check-in.
+    </div>
+
+    <input
+      type="text"
+      id="qrToken"
+      placeholder="Masukkan QR Token"
+      autocomplete="off"
+    >
+
+    <button onclick="findGuest()">
+      CHECK IN
+    </button>
+
+    <div id="result"></div>
+
+  </div>
+
+  <div class="footer">
+    D’MANTEN WEDDING ORGANIZER
+  </div>
+
+</div>
+
+<script>
+
+  const SUPABASE_URL = "https://yeyckoekpqadrbvmetta.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_gMXd17AurWlX-OSSyqd-oA_rtkugfSN";
+
+  const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+  async function findGuest() {
+
+    const token =
+      document.getElementById("qrToken").value.trim();
+
+    const result =
+      document.getElementById("result");
+
+    if (!token) {
+      result.style.display = "block";
+      result.innerHTML =
+        `<div class="error">QR token belum dimasukkan.</div>`;
+      return;
+    }
+
+    result.style.display = "block";
+    result.innerHTML =
+      `<div class="scan-text">Mencari data tamu...</div>`;
+
+    const { data, error } =
+      await supabaseClient.rpc(
+        "get_guest_by_qr",
+        {
+          p_token: token
+        }
+      );
+
+    if (error || !data || data.length === 0) {
+
+      result.innerHTML =
+        `<div class="error">
+          QR tamu tidak ditemukan.
+        </div>`;
+
+      return;
+    }
+
+    const guest = data[0];
+
+    result.innerHTML = `
+      <div class="guest-card">
+
+        <div class="guest-name">
+          ${escapeHTML(guest.guest_name)}
+        </div>
+
+        <div class="category">
+          ${escapeHTML(guest.category)}
+        </div>
+
+        <div class="info">
+          Jumlah Tamu: <b>${guest.guest_count}</b><br>
+          Meja: <b>${escapeHTML(guest.table_number || "-")}</b><br>
+          Status: <b>${escapeHTML(guest.status)}</b>
+        </div>
+
+        <button onclick="confirmCheckIn(${guest.id})">
+          KONFIRMASI HADIR
+        </button>
+
+        <div id="checkinMessage"></div>
+
+      </div>
+    `;
+  }
+
+  async function confirmCheckIn(id) {
+
+    const message =
+      document.getElementById("checkinMessage");
+
+    const { error } =
+      await supabaseClient
+        .from("Guests")
+        .update({
+          status: "Checked In",
+          checked_in_at: new Date().toISOString()
+        })
+        .eq("id", id);
+
+    if (error) {
+
+      message.innerHTML =
+        `<div class="error">
+          Check-in gagal.
+        </div>`;
+
+      return;
+    }
+
+    message.innerHTML =
+      `<div class="success">
+        ✓ TAMU BERHASIL CHECK-IN
+      </div>`;
+  }
+
+  function escapeHTML(text) {
+
+    const div = document.createElement("div");
+
+    div.textContent = text ?? "";
+
+    return div.innerHTML;
+  }
+
+</script>
+
+</body>
+</html>
