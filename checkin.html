@@ -220,15 +220,14 @@
     SUPABASE_PUBLISHABLE_KEY
   );
 
-  async function findGuest() {
+  async function findGuest(token) {
 
-    const token =
-      document.getElementById("qrToken").value.trim();
+    const tokenValue = token?.trim();
 
     const result =
       document.getElementById("result");
 
-    if (!token) {
+    if (!tokenValue) {
       result.style.display = "block";
       result.innerHTML =
         `<div class="error">QR token belum dimasukkan.</div>`;
@@ -241,9 +240,9 @@
 
     const { data, error } =
       await supabaseClient.rpc(
-        "get_guest_by_qr",
+        "check_in_guest",
         {
-          p_token: token
+          p_token: tokenValue
         }
       );
 
@@ -334,11 +333,10 @@ qrScanner.start(
     qrbox: 250
   },
   (decodedText) => {
-    document.getElementById("qrToken").value = decodedText;
-findGuest();
+  findGuest(decodedText);
 
-    qrScanner.stop().catch(() => {});
-  }
+  qrScanner.stop().catch(() => {});
+}
 ).catch((error) => {
   console.error("Kamera QR gagal:", error);
 });
