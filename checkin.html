@@ -339,6 +339,9 @@ qrScanner.start(
 }
 ).catch((error) => {
   console.error("Kamera QR gagal:", error);
+
+  document.getElementById("result").innerHTML =
+    `<div class="error">Kamera QR gagal: ${error}</div>`;
 });
 </script>
 
