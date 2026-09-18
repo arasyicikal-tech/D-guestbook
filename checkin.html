@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+klo <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -281,7 +281,7 @@
           Status: <b>${escapeHTML(guest.status)}</b>
         </div>
 
-        <button onclick="confirmCheckIn(${guest.id})">
+        <button onclick="confirmCheckIn('${guest.qr_token}')"
           KONFIRMASI HADIR
         </button>
 
@@ -291,37 +291,37 @@
     `;
   }
 
-  async function confirmCheckIn(id) {
+  async function confirmCheckIn(token) {
 
-    const message =
-      document.getElementById("checkinMessage");
+  const message =
+    document.getElementById("checkinMessage");
 
-    const { error } =
-      await supabaseClient
-        .from("Guests")
-        .update({
-          status: "Checked In",
-          checked_in_at: new Date().toISOString()
-        })
-        .eq("id", id);
+  const { data, error } =
+    await supabaseClient.rpc(
+      "check_in_guest",
+      {
+        p_token: token
+      }
+    );
 
-    if (error) {
-
-      message.innerHTML =
-        `<div class="error">
-          Check-in gagal.
-        </div>`;
-
-      return;
-    }
-
+  if (error || !data || data.length === 0) {
     message.innerHTML =
-      `<div class="success">
-        ✓ TAMU BERHASIL CHECK-IN
-      </div>`;
+      `<div class="error">Check-in gagal.</div>`;
+    return;
   }
 
-  function escapeHTML(text) {
+  const guest = data[0];
+
+  message.innerHTML = `
+    <div class="success">
+      ✓ TAMU BERHASIL CHECK-IN
+      <br><br>
+      <strong>${escapeHTML(guest.guest_name)}</strong>
+      <br>
+      Jumlah tamu: ${guest.guest_count}
+    </div>
+  `;
+}
 
     const div = document.createElement("div");
 
