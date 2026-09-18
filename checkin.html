@@ -322,7 +322,7 @@
     return div.innerHTML;
   }
 // QR SCANNER
-document.addEventListener("DOMContentLoaded", function () {
+  (function () {
 
   const reader = document.getElementById("qr-reader");
 
@@ -367,7 +367,7 @@ document.addEventListener("DOMContentLoaded", function () {
     onScanFailure
   );
 
-});
+})();
 </script>
 
 </body>
