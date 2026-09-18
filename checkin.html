@@ -324,7 +324,24 @@
 
     return div.innerHTML;
   }
+// QR SCANNER
+const qrScanner = new Html5Qrcode("qr-reader");
 
+qrScanner.start(
+  { facingMode: "environment" },
+  {
+    fps: 10,
+    qrbox: 250
+  },
+  (decodedText) => {
+    document.getElementById("qrToken").value = decodedText;
+findGuest();
+
+    qrScanner.stop().catch(() => {});
+  }
+).catch((error) => {
+  console.error("Kamera QR gagal:", error);
+});
 </script>
 
 </body>
