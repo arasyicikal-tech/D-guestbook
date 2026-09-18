@@ -196,9 +196,7 @@
 
     <div id="qr-reader" style="width:100%; max-width:400px; margin:20px auto;"></div>
 
-    <button onclick="findGuest()">
-      CHECK IN
-    </button>
+    
 
     <div id="result"></div>
 
@@ -324,25 +322,33 @@
     return div.innerHTML;
   }
 // QR SCANNER
-const qrScanner = new Html5Qrcode("qr-reader");
-
-qrScanner.start(
-  { facingMode: "environment" },
-  {
-    fps: 10,
-    qrbox: 250
-  },
-  (decodedText) => {
+function onScanSuccess(decodedText) {
   findGuest(decodedText);
 
-  qrScanner.stop().catch(() => {});
+  html5QrcodeScanner.clear().catch(() => {});
 }
-).catch((error) => {
-  console.error("Kamera QR gagal:", error);
 
-  document.getElementById("result").innerHTML =
-    `<div class="error">Kamera QR gagal: ${error}</div>`;
-});
+function onScanFailure(error) {
+  // Abaikan error scan sementara
+}
+
+const html5QrcodeScanner = new Html5QrcodeScanner(
+  "qr-reader",
+  {
+    fps: 10,
+    qrbox: {
+      width: 250,
+      height: 250
+    },
+    rememberLastUsedCamera: true
+  },
+  false
+);
+
+html5QrcodeScanner.render(
+  onScanSuccess,
+  onScanFailure
+);
 </script>
 
 </body>
