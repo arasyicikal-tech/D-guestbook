@@ -469,7 +469,61 @@ h1 {
   </div>
 
 </div>
+<!-- DAFTAR TAMU -->
+<div style="
+  margin-top:35px;
+  background:white;
+  border:1px solid #d8c7a0;
+  border-radius:10px;
+  padding:24px;
+">
 
+  <h2 style="margin-top:0;">
+    Daftar Tamu
+  </h2>
+
+  <div style="
+    display:grid;
+    gap:12px;
+    margin-top:20px;
+  ">
+
+    <select
+      id="guestListWedding"
+      style="
+        padding:14px;
+        border:1px solid #ccc;
+        border-radius:6px;
+        font-size:16px;
+      "
+    >
+      <option value="1">Cikal & Nadya</option>
+      <option value="2">Sinta & Barba</option>
+    </select>
+
+    <input
+      id="guestSearch"
+      type="text"
+      placeholder="Cari nama tamu..."
+      style="
+        padding:14px;
+        border:1px solid #ccc;
+        border-radius:6px;
+        font-size:16px;
+      "
+      oninput="loadGuestList()"
+    >
+
+  </div>
+
+  <div
+    id="guestList"
+    style="margin-top:20px;"
+  >
+    Memuat daftar tamu...
+  </div>
+
+</div>
 <script>
 
 const SUPABASE_URL = "https://yeyckoekpqadrbvmetta.supabase.co";
@@ -922,6 +976,76 @@ async function createWedding() {
   document.getElementById("guestName").value = "";
   document.getElementById("guestCount").value = 1;
 }
+  async function loadGuestList() {
+
+  const weddingId =
+    Number(document.getElementById("guestListWedding").value);
+
+  const search =
+    document.getElementById("guestSearch").value
+      .trim()
+      .toLowerCase();
+
+  const container =
+    document.getElementById("guestList");
+
+  container.innerHTML = "Memuat daftar tamu...";
+
+  const { data, error } =
+    await supabaseClient
+      .from("guests")
+      .select("*")
+      .eq("wedding_id", weddingId)
+      .order("id", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    container.innerHTML =
+      "<p>Gagal memuat daftar tamu.</p>";
+    return;
+  }
+
+  const guests = (data || []).filter(guest =>
+    (guest.guest_name || "")
+      .toLowerCase()
+      .includes(search)
+  );
+
+  if (guests.length === 0) {
+    container.innerHTML =
+      "<p>Belum ada tamu.</p>";
+    return;
+  }
+
+  container.innerHTML = guests.map(guest => `
+    <div style="
+      padding:16px;
+      margin-bottom:12px;
+      border:1px solid #ddd;
+      border-radius:8px;
+      background:#fafafa;
+    ">
+
+      <strong>
+        ${escapeHTML(guest.guest_name)}
+      </strong>
+
+      <div style="margin-top:6px;">
+        Jumlah tamu: ${guest.guest_count}
+      </div>
+
+      <div style="
+        margin-top:6px;
+        color:${guest.checked_in ? "#39734a" : "#999"};
+      ">
+        ${guest.checked_in
+          ? "✓ Sudah Check-In"
+          : "○ Belum Check-In"}
+      </div>
+
+    </div>
+  `).join("");
+}
 async function loadWeddingQR() {
 
   const { data, error } = await supabaseClient
@@ -1015,6 +1139,7 @@ wedding.id;
 }
 
 loadWeddingQR();
+  loadGuestList();
 </script>
 </body>
 </html>
