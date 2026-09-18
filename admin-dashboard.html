@@ -371,6 +371,8 @@ h1 {
       "
     >
       <option value="">Pilih Wedding</option>
+<option value="1">Cikal & Nadya</option>
+<option value="2">Sinta & Barba</option>
     </select>
 
     <input
@@ -854,7 +856,7 @@ async function createWedding() {
     await supabaseClient
       .from("guests")
       .insert({
-        wedding_id: 1,
+        wedding_id: Number(document.getElementById("guestWedding").value),
         guest_name: guestName,
         guest_count: guestCount,
         qr_token: qrToken
