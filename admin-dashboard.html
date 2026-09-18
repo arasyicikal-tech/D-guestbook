@@ -385,18 +385,7 @@ h1 {
       "
     >
 
-    <select
-      id="guestCategory"
-      style="
-        padding:14px;
-        border:1px solid #ccc;
-        border-radius:6px;
-        font-size:16px;
-      "
-    >
-      <option value="Regular">Regular</option>
-      <option value="VIP">VIP</option>
-    </select>
+    
 
     <input
       id="guestCount"
@@ -830,6 +819,107 @@ async function createWedding() {
 </div>
 
 <script>
+  async function createGuest() {
+
+  const guestName =
+    document.getElementById("guestName").value.trim();
+
+  const guestCount =
+    Number(document.getElementById("guestCount").value);
+
+  const result =
+    document.getElementById("guestResult");
+
+  if (!guestName) {
+    result.innerHTML =
+      `<div style="color:#b00020;">
+        Nama tamu wajib diisi.
+      </div>`;
+    return;
+  }
+
+  if (!guestCount || guestCount < 1) {
+    result.innerHTML =
+      `<div style="color:#b00020;">
+        Jumlah tamu minimal 1.
+      </div>`;
+    return;
+  }
+
+  const qrToken =
+    "DG-" +
+    crypto.randomUUID().replaceAll("-", "").slice(0, 12).toUpperCase();
+
+  const { data, error } =
+    await supabaseClient
+      .from("guests")
+      .insert({
+        wedding_id: 1,
+        guest_name: guestName,
+        guest_count: guestCount,
+        qr_token: qrToken
+      })
+      .select()
+      .single();
+
+  if (error) {
+    console.error(error);
+
+    result.innerHTML =
+      `<div style="color:#b00020;">
+        Gagal membuat data tamu.
+      </div>`;
+    return;
+  }
+
+  result.innerHTML = `
+    <div style="
+      margin-top:20px;
+      padding:20px;
+      background:#f8f5ef;
+      border:1px solid #d8c7a0;
+      border-radius:10px;
+      text-align:center;
+    ">
+
+      <h3>✓ TAMU BERHASIL DITAMBAHKAN</h3>
+
+      <strong>${escapeHTML(data.guest_name)}</strong>
+
+      <p>
+        Jumlah tamu: ${data.guest_count}
+      </p>
+
+      <div
+        id="guestQRCode"
+        style="
+          display:inline-block;
+          margin:15px 0;
+        "
+      ></div>
+
+      <p style="
+        font-size:13px;
+        color:#777;
+      ">
+        Token: ${escapeHTML(data.qr_token)}
+      </p>
+
+    </div>
+  `;
+
+  new QRCode(
+    document.getElementById("guestQRCode"),
+    {
+      text: data.qr_token,
+      width: 200,
+      height: 200
+    }
+  );
+
+  document.getElementById("guestName").value = "";
+  document.getElementById("guestCount").value = 1;
+}
 async function loadWeddingQR() {
 
   const { data, error } = await supabaseClient
