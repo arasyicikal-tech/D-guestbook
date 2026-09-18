@@ -283,28 +283,58 @@
     `;
   }
 
-  async function confirmCheckIn(token) {
+  async function findGuest(token) {
 
-  const message =
-    document.getElementById("checkinMessage");
+  const tokenValue = token?.trim();
+  const result = document.getElementById("result");
 
-  const { data, error } =
-    await supabaseClient.rpc(
-      "check_in_guest",
-      {
-        p_token: token
-      }
-    );
+  if (!tokenValue) {
+    result.style.display = "block";
+    result.innerHTML = `
+      <div class="error">
+        QR token tidak valid.
+      </div>
+    `;
+    return;
+  }
 
-  if (error || !data || data.length === 0) {
-    message.innerHTML =
-      `<div class="error">Check-in gagal.</div>`;
+  result.style.display = "block";
+  result.innerHTML = `
+    <div class="scan-text">
+      Memproses check-in...
+    </div>
+  `;
+
+  const { data, error } = await supabaseClient.rpc(
+    "check_in_guest",
+    {
+      p_token: tokenValue
+    }
+  );
+
+  if (error) {
+    console.error("Check-in error:", error);
+
+    result.innerHTML = `
+      <div class="error">
+        Check-in gagal.
+      </div>
+    `;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    result.innerHTML = `
+      <div class="error">
+        QR tamu tidak ditemukan.
+      </div>
+    `;
     return;
   }
 
   const guest = data[0];
 
-  message.innerHTML = `
+  result.innerHTML = `
     <div class="success">
       ✓ TAMU BERHASIL CHECK-IN
       <br><br>
@@ -315,12 +345,15 @@
   `;
 }
 
-    const div = document.createElement("div");
 
-    div.textContent = text ?? "";
+function escapeHTML(text) {
 
-    return div.innerHTML;
-  }
+  const div = document.createElement("div");
+
+  div.textContent = text ?? "";
+
+  return div.innerHTML;
+}
 // QR SCANNER
   (function () {
 
