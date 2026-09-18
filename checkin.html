@@ -322,33 +322,52 @@
     return div.innerHTML;
   }
 // QR SCANNER
-function onScanSuccess(decodedText) {
-  findGuest(decodedText);
+document.addEventListener("DOMContentLoaded", function () {
 
-  html5QrcodeScanner.clear().catch(() => {});
-}
+  const reader = document.getElementById("qr-reader");
 
-function onScanFailure(error) {
-  // Abaikan error scan sementara
-}
+  if (!reader) {
+    return;
+  }
 
-const html5QrcodeScanner = new Html5QrcodeScanner(
-  "qr-reader",
-  {
-    fps: 10,
-    qrbox: {
-      width: 250,
-      height: 250
+  if (typeof Html5QrcodeScanner === "undefined") {
+    reader.innerHTML = `
+      <div class="error">
+        QR Scanner gagal dimuat.
+      </div>
+    `;
+    return;
+  }
+
+  function onScanSuccess(decodedText) {
+    findGuest(decodedText);
+
+    html5QrcodeScanner.clear().catch(() => {});
+  }
+
+  function onScanFailure(error) {
+    // Abaikan error scan sementara
+  }
+
+  const html5QrcodeScanner = new Html5QrcodeScanner(
+    "qr-reader",
+    {
+      fps: 10,
+      qrbox: {
+        width: 250,
+        height: 250
+      },
+      rememberLastUsedCamera: true
     },
-    rememberLastUsedCamera: true
-  },
-  false
-);
+    false
+  );
 
-html5QrcodeScanner.render(
-  onScanSuccess,
-  onScanFailure
-);
+  html5QrcodeScanner.render(
+    onScanSuccess,
+    onScanFailure
+  );
+
+});
 </script>
 
 </body>
