@@ -446,7 +446,93 @@ h1 {
     </div>
 
   </div>
+<!-- ============================= -->
+<!-- DASHBOARD CHECK-IN -->
+<!-- ============================= -->
 
+<div style="
+  margin-top:35px;
+  background:white;
+  border:1px solid #d8c7a0;
+  border-radius:10px;
+  padding:24px;
+">
+
+  <h2 style="margin-top:0;">
+    Dashboard Check-In
+  </h2>
+
+  <p style="color:#8a7e73;">
+    Statistik kehadiran tamu berdasarkan wedding.
+  </p>
+
+  <select
+    id="checkinWedding"
+    style="
+      width:100%;
+      padding:14px;
+      border:1px solid #ccc;
+      border-radius:6px;
+      font-size:16px;
+      margin-top:15px;
+    "
+  >
+    <option value="">Pilih Wedding</option>
+  </select>
+
+  <div class="stats" style="margin-top:20px;">
+
+    <div class="stat">
+      <div class="stat-label">
+        Total Tamu
+      </div>
+      <div
+        class="stat-number"
+        id="totalCheckinGuests"
+      >
+        0
+      </div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-label">
+        Sudah Hadir
+      </div>
+      <div
+        class="stat-number"
+        id="checkedInGuests"
+      >
+        0
+      </div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-label">
+        Belum Hadir
+      </div>
+      <div
+        class="stat-number"
+        id="notCheckedInGuests"
+      >
+        0
+      </div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-label">
+        Total Orang Hadir
+      </div>
+      <div
+        class="stat-number"
+        id="totalPeopleCheckedIn"
+      >
+        0
+      </div>
+    </div>
+
+  </div>
+
+</div>
   <div class="toolbar">
     <h2>Ucapan Tamu</h2>
     <button class="refresh" onclick="loadMessages()">
