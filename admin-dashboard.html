@@ -1285,7 +1285,7 @@ async function loadCheckinStats() {
     const { data: guests, error } =
       await supabaseClient
         .from("guests")
-        .select("id, guest_count, checked_in")
+        .select("id, guest_name, guest_count, checked_in")
         .eq("wedding_id", weddingId);
 
     if (error) {
