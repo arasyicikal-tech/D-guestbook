@@ -1316,7 +1316,42 @@ async function loadCheckinStats() {
 
     document.getElementById("totalPeopleCheckedIn").textContent =
       totalOrangHadir;
+const guestListElement =
+  document.getElementById("checkinGuestList");
 
+guestListElement.innerHTML = guests.map(guest => `
+  <div style="
+    padding:16px;
+    margin-bottom:10px;
+    border:1px solid #e2d7c5;
+    border-radius:8px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+  ">
+
+    <div>
+      <strong>
+        ${escapeHTML(guest.guest_name || "-")}
+      </strong>
+      <div style="
+        color:#8a7e73;
+        margin-top:5px;
+      ">
+        Jumlah tamu: ${guest.guest_count || 0}
+      </div>
+    </div>
+
+    <div style="
+      font-weight:600;
+      color:${guest.checked_in ? "#4f6b52" : "#9a8b78"};
+    ">
+      ${guest.checked_in ? "✓ HADIR" : "⏳ BELUM HADIR"}
+    </div>
+
+  </div>
+`).join("");
   });
 
 }
