@@ -1214,7 +1214,91 @@ wedding.id;
     container.appendChild(card);
   });
 }
+async function loadCheckinStats() {
 
+  const select = document.getElementById("checkinWedding");
+
+  if (!select) return;
+
+  const { data: weddings, error: weddingError } =
+    await supabaseClient
+      .from("Weddings")
+      .select("id, bride_name, groom_name")
+      .order("id", { ascending: true });
+
+  if (weddingError) {
+    console.error("Gagal memuat wedding:", weddingError);
+    return;
+  }
+
+  select.innerHTML =
+    `<option value="">Pilih Wedding</option>`;
+
+  weddings.forEach(wedding => {
+
+    const option = document.createElement("option");
+
+    option.value = wedding.id;
+
+    option.textContent =
+      `${wedding.bride_name || ""} & ${wedding.groom_name || ""}`;
+
+    select.appendChild(option);
+
+  });
+
+  select.addEventListener("change", async function () {
+
+    const weddingId = Number(this.value);
+
+    if (!weddingId) {
+      document.getElementById("totalCheckinGuests").textContent = "0";
+      document.getElementById("checkedInGuests").textContent = "0";
+      document.getElementById("notCheckedInGuests").textContent = "0";
+      document.getElementById("totalPeopleCheckedIn").textContent = "0";
+      return;
+    }
+
+    const { data: guests, error } =
+      await supabaseClient
+        .from("guests")
+        .select("id, guest_count, checked_in")
+        .eq("wedding_id", weddingId);
+
+    if (error) {
+      console.error("Gagal memuat statistik check-in:", error);
+      return;
+    }
+
+    const total = guests.length;
+
+    const checkedIn = guests.filter(
+      guest => guest.checked_in === true
+    );
+
+    const hadir = checkedIn.length;
+
+    const belumHadir = total - hadir;
+
+    const totalOrangHadir = checkedIn.reduce(
+      (sum, guest) => sum + Number(guest.guest_count || 0),
+      0
+    );
+
+    document.getElementById("totalCheckinGuests").textContent = total;
+
+    document.getElementById("checkedInGuests").textContent = hadir;
+
+    document.getElementById("notCheckedInGuests").textContent = belumHadir;
+
+    document.getElementById("totalPeopleCheckedIn").textContent =
+      totalOrangHadir;
+
+  });
+
+}
+
+loadCheckinStats();
 loadWeddingQR();
   loadGuestList();
 </script>
