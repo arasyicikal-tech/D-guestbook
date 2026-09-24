@@ -480,15 +480,28 @@ h1 {
 
   const guest = data[0];
 
+if (guest.status === "already_checked_in") {
   result.innerHTML = `
-    <div class="success">
-      ✓ TAMU BERHASIL CHECK-IN
+    <div class="error">
+      ⚠ TAMU SUDAH CHECK-IN
       <br><br>
       <strong>${escapeHTML(guest.guest_name)}</strong>
       <br>
-      Jumlah tamu: ${guest.guest_count}
+      Tamu ini sudah melakukan check-in sebelumnya.
     </div>
   `;
+  return;
+}
+
+result.innerHTML = `
+  <div class="success">
+    ✓ TAMU BERHASIL CHECK-IN
+    <br><br>
+    <strong>${escapeHTML(guest.guest_name)}</strong>
+    <br>
+    Jumlah tamu: ${guest.guest_count}
+  </div>
+`;
 }
 
 
