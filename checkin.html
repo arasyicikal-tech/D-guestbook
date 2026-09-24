@@ -469,7 +469,7 @@ h1 {
     return;
   }
 
-  if (!data || data.length === 0) {
+  if (!data) {
     result.innerHTML = `
       <div class="error">
         QR tamu tidak ditemukan.
@@ -478,7 +478,7 @@ h1 {
     return;
   }
 
-  const guest = data[0];
+  const guest = data;
 console.log("HASIL CHECK-IN:", guest);
 if (guest.status === "already_checked_in") {
   result.innerHTML = `
