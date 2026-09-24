@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>D’Guestbook — Admin Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f6f3ef;
+  color: #3f3832;
+}
+
+header {
+  background: #3f3832;
+  color: white;
+  padding: 20px;
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.logo {
+  font-size: 22px;
+  letter-spacing: 4px;
+}
+
+.logout {
+  border: 1px solid rgba(255,255,255,.5);
+  background: transparent;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 0 18px;
+}
+
+h1 {
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  color: #8a7e73;
+  margin-top: 0;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin: 25px 0;
+}
+
+.stat {
+  background: white;
+  border: 1px solid #ddd5cd;
+  padding: 22px;
+  border-radius: 10px;
+}
+
+.stat-label {
+  color: #8a7e73;
+  font-size: 14px;
+}
+
+.stat-number {
+  font-size: 32px;
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 25px 0 15px;
+  gap: 10px;
+}
+
+.refresh {
+  border: 1px solid #8a7e73;
+  background: white;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.message-card {
+  background: white;
+  border: 1px solid #ddd5cd;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 15px;
+}
+
+.message-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.guest-name {
+  font-size: 19px;
+  font-weight: bold;
+}
+
+.status {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.pending {
+  background: #f3e4c7;
+  color: #76551e;
+}
+
+.approved {
+  background: #dcebdc;
+  color: #355d35;
+}
+
+.message-text {
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 15px 0;
+}
+
+.meta {
+  color: #9b9189;
+  font-size: 13px;
+}
+
+.actions {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.approve {
+  background: #3f3832;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.delete {
+  background: white;
+  color: #9b3333;
+  border: 1px solid #c88;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.empty {
+  background: white;
+  border: 1px solid #ddd5cd;
+  padding: 30px;
+  text-align: center;
+  color: #8a7e73;
+}
+
+.loading {
+  text-align: center;
+  padding: 30px;
+  color: #8a7e73;
+}
+
+.error {
+  background: #f8dddd;
+  color: #7b2222;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 650px) {
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .header-inner {
+    align-items: flex-start;
+  }
+
+  .logo {
+    font-size: 17px;
+  }
+
+  .message-top {
+    flex-direction: column;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+}
+</style>
+
+<style id="dg-professional-dashboard">
+:root{--dg-gold:#b08d4f;--dg-border:#e5dbcd;--dg-green:#4f7b5a;--dg-red:#a65353;--dg-shadow:0 8px 24px rgba(70,52,34,.07)}
+body{background:linear-gradient(180deg,#f8f5ef 0%,#f5f0e8 100%)}
+header{background:linear-gradient(135deg,#302b27,#4b4036);box-shadow:0 4px 18px rgba(40,30,20,.12)}
+.container{max-width:1180px;padding-bottom:50px}
+h1{font-size:30px}
+.stat{border:1px solid var(--dg-border);border-radius:16px;padding:20px;box-shadow:var(--dg-shadow);position:relative;overflow:hidden;transition:.2s}
+.stat:hover{transform:translateY(-2px)}
+.stat::after{content:"";position:absolute;right:-25px;top:-25px;width:85px;height:85px;border-radius:50%;background:rgba(176,141,79,.08)}
+.stat-number{font-size:34px}
+.dg-checkin-stats .stat:nth-child(1){background:linear-gradient(145deg,#fff,#f8f4ec)}
+.dg-checkin-stats .stat:nth-child(2){background:linear-gradient(145deg,#fff,#edf6ee)}
+.dg-checkin-stats .stat:nth-child(3){background:linear-gradient(145deg,#fff,#fcf0f0)}
+.dg-checkin-stats .stat:nth-child(4){background:linear-gradient(145deg,#fff,#edf3f8)}
+.dg-checkin-stats .stat:nth-child(1) .stat-label::before{content:"👥 ";font-size:17px}
+.dg-checkin-stats .stat:nth-child(2) .stat-label::before{content:"✓ ";color:var(--dg-green);font-size:17px}
+.dg-checkin-stats .stat:nth-child(3) .stat-label::before{content:"⌛ ";color:var(--dg-red);font-size:17px}
+.dg-checkin-stats .stat:nth-child(4) .stat-label::before{content:"🧑‍🤝‍🧑 ";font-size:16px}
+.dg-section{background:#fff;border:1px solid var(--dg-border);border-radius:18px;padding:26px;margin-top:28px;box-shadow:var(--dg-shadow)}
+.dg-section-head{display:flex;align-items:flex-start;gap:14px}
+.dg-icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#f5ead6;font-size:20px;flex:0 0 auto}
+.dg-guest-row{padding:15px 16px;margin-bottom:10px;border:1px solid var(--dg-border);border-radius:12px;display:flex;justify-content:space-between;align-items:center;gap:15px;background:#fffdf9}
+.dg-guest-row:hover{background:#fffaf1}
+.dg-guest-name{font-weight:700;font-size:15px}.dg-guest-count{color:#8b8177;font-size:13px;margin-top:5px}
+.dg-status{display:inline-flex;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:700}
+.dg-status.hadir{background:#e8f2e9;color:var(--dg-green)}
+.dg-status.belum{background:#f4eee4;color:#907348}
+input:focus,select:focus{border-color:var(--dg-gold)!important;box-shadow:0 0 0 3px rgba(176,141,79,.12);outline:none}
+@media(max-width:650px){.container{padding:0 14px 35px}h1{font-size:25px}.dg-section{padding:20px}.dg-guest-row{align-items:flex-start;flex-direction:column}.dg-status{align-self:flex-start}}
+</style>
+
+</head>
+
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">D’GUESTBOOK ADMIN</div>
+    <button class="logout" onclick="logout()">Logout</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <h1>Admin Dashboard</h1>
+  <p class="subtitle">
+    Kelola ucapan tamu D’Guestbook
+  </p>
+<!-- ============================
+     MANAJEMEN WEDDING
+============================= -->
+
+<div style="margin-top:35px;">
+
+  <div style="
+    background:white;
+    border:1px solid #ddd5cd;
+    border-radius:10px;
+    padding:24px;
+  ">
+
+    <h2 style="margin-top:0;">
+      Manajemen Wedding
+    </h2>
+
+    <p style="color:#8a7e73;">
+      Kelola data pasangan yang menggunakan D’Guestbook.
+    </p>
+
+    <div style="
+      display:grid;
+      gap:12px;
+      margin-top:20px;
+    ">
+
+      <input
+        id="weddingBride"
+        type="text"
+        placeholder="Nama Pengantin Wanita"
+        style="
+          padding:14px;
+          border:1px solid #ccc;
+          border-radius:6px;
+          font-size:16px;
+        "
+      >
+
+      <input
+        id="weddingGroom"
+        type="text"
+        placeholder="Nama Pengantin Pria"
+        style="
+          padding:14px;
+          border:1px solid #ccc;
+          border-radius:6px;
+          font-size:16px;
+        "
+      >
+
+      <input
+        id="weddingDate"
+        type="date"
+        style="
+          padding:14px;
+          border:1px solid #ccc;
+          border-radius:6px;
+          font-size:16px;
+        "
+      >
+
+      <input
+        id="weddingVenue"
+        type="text"
+        placeholder="Venue / Lokasi Wedding"
+        style="
+          padding:14px;
+          border:1px solid #ccc;
+          border-radius:6px;
+          font-size:16px;
+        "
+      >
+
+      <button
+        onclick="createWedding()"
+        style="
+          padding:14px;
+          border:0;
+          border-radius:6px;
+          background:#3f3832;
+          color:white;
+          font-size:16px;
+          cursor:pointer;
+        "
+      >
+        + Tambah Wedding
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- ============================= -->
+<!-- MANAJEMEN TAMU -->
+<!-- ============================= -->
+
+<div style="
+  margin-top:35px;
+  background:white;
+  border:1px solid #d8c7a0;
+  border-radius:10px;
+  padding:24px;
+">
+
+  <h2 style="margin-top:0;">
+    Manajemen Tamu
+  </h2>
+
+  <p style="color:#8a7e73;">
+    Tambahkan data tamu dan buat QR Check-In masing-masing tamu.
+  </p>
+
+  <div style="
+    display:grid;
+    gap:12px;
+    margin-top:20px;
+  ">
+
+    <select
+      id="guestWedding"
+      style="
+        padding:14px;
+        border:1px solid #ccc;
+        border-radius:6px;
+        font-size:16px;
+      "
+    >
+      <option value="">Pilih Wedding</option>
+<option value="1">Cikal & Nadya</option>
+<option value="2">Sinta & Barba</option>
+    </select>
+
+    <input
+      id="guestName"
+      type="text"
+      placeholder="Nama Tamu"
+      style="
+        padding:14px;
+        border:1px solid #ccc;
+        border-radius:6px;
+        font-size:16px;
+      "
+    >
+
+    
+
+    <input
+      id="guestCount"
+      type="number"
+      min="1"
+      value="1"
+      placeholder="Jumlah Tamu"
+      style="
+        padding:14px;
+        border:1px solid #ccc;
+        border-radius:6px;
+        font-size:16px;
+      "
+    >
+
+    
+
+    <button
+      onclick="createGuest()"
+      style="
+        padding:14px;
+        border:0;
+        border-radius:6px;
+        background:#b08d4f;
+        color:white;
+        font-size:16px;
+        cursor:pointer;
+      "
+    >
+      + TAMBAH TAMU & BUAT QR
+    </button>
+
+  </div>
+
+  <div id="guestResult" style="margin-top:20px;"></div>
+
+</div>
+</div>
+  <div id="errorBox"></div>
+
+  <div class="stats">
+
+    <div class="stat">
+      <div class="stat-label">Total Ucapan</div>
+      <div class="stat-number" id="totalCount">0</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-label">Menunggu Approval</div>
+      <div class="stat-number" id="pendingCount">0</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-label">Sudah Tampil</div>
+      <div class="stat-number" id="approvedCount">0</div>
+    </div>
+
+  </div>
+<!-- ============================= -->
+<!-- DASHBOARD CHECK-IN -->
+<!-- ============================= -->
+
+<div style="
+  margin-top:35px;
+  background:white;
+  border:1px solid #d8c7a0;
+  border-radius:10px;
+  padding:24px;
+">
+
+  <h2 style="margin-top:0;">
+    Dashboard Check-In
+  </h2>
+
+  <p style="color:#8a7e73;">
+    Statistik kehadiran tamu berdasarkan wedding.
+  </p>
+
+  <select
+    id="checkinWedding"
+    style="
+      width:100%;
+      padding:14px;
+      border:1px solid #ccc;
+      border-radius:6px;
+      font-size:16px;
+      margin-top:15px;
+    "
+  >
+    <option value="">Pilih Wedding</option>
+  </select>
+
+  <div class="stats dg-checkin-stats" style="margin-top:20px;">
+
+    <div class="stat">
+      <div class="stat-label">
+        Total Tamu
+      </div>
+      <div
+        class="stat-number"
+        id="totalCheckinGuests"
+      >
+        0
+      </div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-label">
+        Sudah Hadir
+      </div>
+      <div
+        class="stat-number"
+        id="checkedInGuests"
+      >
+        0
+      </div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-label">
+        Belum Hadir
+      </div>
+      <div
+        class="stat-number"
+        id="notCheckedInGuests"
+      >
+        0
+      </div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-label">
+        Total Orang Hadir
+      </div>
+      <div
+        class="stat-number"
+        id="totalPeopleCheckedIn"
+      >
+        0
+      </div>
+    </div>
+
+  </div>
+
+</div>
+  <!-- DAFTAR KEHADIRAN TAMU -->
+
+<div style="
+  margin-top:25px;
+  background:white;
+  border:1px solid #d8c7a0;
+  border-radius:10px;
+  padding:24px;
+">
+
+  <h2 style="margin-top:0;">
+    Daftar Kehadiran Tamu
+  </h2>
+
+  <p style="color:#8a7e73;">
+    Status kehadiran tamu berdasarkan wedding.
+  </p>
+
+  <div id="checkinGuestList" style="margin-top:20px;">
+    Pilih wedding untuk melihat daftar tamu.
+  </div>
+
+</div>
+  <div class="toolbar">
+    <h2>Ucapan Tamu</h2>
+    <button class="refresh" onclick="loadMessages()">
+      ↻ Refresh
+    </button>
+  </div>
+
+  <div id="messageList" class="loading">
+    Memuat data...
+  </div>
+
+</div>
+<!-- DAFTAR TAMU -->
+<div style="
+  margin-top:35px;
+  background:white;
+  border:1px solid #d8c7a0;
+  border-radius:10px;
+  padding:24px;
+">
+
+  <h2 style="margin-top:0;">
+    Daftar Tamu
+  </h2>
+
+  <div style="
+    display:grid;
+    gap:12px;
+    margin-top:20px;
+  ">
+
+    <select
+  id="guestListWedding"
+  onchange="loadGuestList()"
+      style="
+        padding:14px;
+        border:1px solid #ccc;
+        border-radius:6px;
+        font-size:16px;
+      "
+    >
+      <option value="1">Cikal & Nadya</option>
+      <option value="2">Sinta & Barba</option>
+    </select>
+
+    <input
+      id="guestSearch"
+      type="text"
+      placeholder="Cari nama tamu..."
+      style="
+        padding:14px;
+        border:1px solid #ccc;
+        border-radius:6px;
+        font-size:16px;
+      "
+      oninput="loadGuestList()"
+    >
+
+  </div>
+
+  <div
+    id="guestList"
+    style="margin-top:20px;"
+  >
+    Memuat daftar tamu...
+  </div>
+
+</div>
+<script>
+
+const SUPABASE_URL = "https://yeyckoekpqadrbvmetta.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_gMXd17AurWlX-OSSyqd-oA_rtkugfSN";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
+
+// ============================
+// CEK SESSION & ADMIN
+// ============================
+
+async function checkAdmin() {
+
+  const {
+    data: { session }
+  } = await supabaseClient.auth.getSession();
+
+  if (!session) {
+    window.location.href = "admin.html";
+    return false;
+  }
+
+  const { data: isAdmin, error } =
+    await supabaseClient.rpc("is_admin");
+
+  if (error || !isAdmin) {
+    alert("Akses ditolak. Anda bukan admin.");
+    await supabaseClient.auth.signOut();
+    window.location.href = "admin.html";
+    return false;
+  }
+
+  return true;
+}
+
+
+// ============================
+// LOAD MESSAGES
+// ============================
+
+async function loadMessages() {
+
+  const list = document.getElementById("messageList");
+
+  list.innerHTML =
+    '<div class="loading">Memuat ucapan...</div>';
+
+  const { data: messages, error } =
+    await supabaseClient
+      .from("messages")
+      .select("*")
+      .order("created_at", {
+        ascending: false
+      });
+
+  if (error) {
+
+    document.getElementById("errorBox").innerHTML =
+      '<div class="error">' +
+      escapeHTML(error.message) +
+      '</div>';
+
+    list.innerHTML = "";
+    return;
+  }
+
+  document.getElementById("errorBox").innerHTML = "";
+
+  updateStats(messages);
+
+  if (!messages || messages.length === 0) {
+
+    list.innerHTML =
+      '<div class="empty">Belum ada ucapan tamu.</div>';
+
+    return;
+  }
+
+  list.innerHTML = messages.map(message => {
+
+    const isApproved = message.is_approved === true;
+
+    const statusClass =
+      isApproved ? "approved" : "pending";
+
+    const statusText =
+      isApproved ? "Approved" : "Menunggu Approval";
+
+    const date = message.created_at
+      ? new Date(message.created_at).toLocaleString("id-ID")
+      : "-";
+
+    return `
+
+      <div class="message-card">
+
+        <div class="message-top">
+
+          <div class="guest-name">
+            ${escapeHTML(message.guest_name || "Tanpa Nama")}
+          </div>
+
+          <div class="status ${statusClass}">
+            ${statusText}
+          </div>
+
+        </div>
+
+        <div class="message-text">
+          ${escapeHTML(message.message || "")}
+        </div>
+
+        <div class="meta">
+          Wedding ID: ${message.wedding_id || "-"}
+          · ${date}
+        </div>
+
+        <div class="actions">
+
+          ${
+            !isApproved
+              ? `
+                <button
+                  class="approve"
+                  onclick="approveMessage(${message.id})">
+                  ✓ Approve
+                </button>
+              `
+              : ""
+          }
+
+          <button
+            class="delete"
+            onclick="deleteMessage(${message.id})">
+            🗑 Hapus
+          </button>
+
+        </div>
+
+      </div>
+
+    `;
+
+  }).join("");
+}
+
+
+// ============================
+// STATISTICS
+// ============================
+
+function updateStats(messages) {
+
+  const total = messages.length;
+
+  const pending =
+    messages.filter(
+      item => item.is_approved !== true
+    ).length;
+
+  const approved =
+    messages.filter(
+      item => item.is_approved === true
+    ).length;
+
+  document.getElementById("totalCount").textContent =
+    total;
+
+  document.getElementById("pendingCount").textContent =
+    pending;
+
+  document.getElementById("approvedCount").textContent =
+    approved;
+}
+
+
+// ============================
+// APPROVE
+// ============================
+
+async function approveMessage(id) {
+
+  const confirmApprove =
+    confirm("Approve ucapan ini agar tampil di website?");
+
+  if (!confirmApprove) return;
+
+  const { error } =
+    await supabaseClient
+      .from("messages")
+      .update({
+        is_approved: true
+      })
+      .eq("id", id);
+
+  if (error) {
+
+    alert(
+      "Gagal approve: " +
+      error.message
+    );
+
+    return;
+  }
+
+  await loadMessages();
+}
+
+
+// ============================
+// DELETE
+// ============================
+
+async function deleteMessage(id) {
+
+  const confirmDelete =
+    confirm("Yakin ingin menghapus ucapan ini?");
+
+  if (!confirmDelete) return;
+
+  const { error } =
+    await supabaseClient
+      .from("messages")
+      .delete()
+      .eq("id", id);
+
+  if (error) {
+
+    alert(
+      "Gagal menghapus: " +
+      error.message
+    );
+
+    return;
+  }
+
+  await loadMessages();
+}
+
+
+// ============================
+// LOGOUT
+// ============================
+
+async function logout() {
+
+  await supabaseClient.auth.signOut();
+
+  window.location.href = "admin.html";
+}
+
+
+// ============================
+// SECURITY
+// ============================
+
+function escapeHTML(text) {
+
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+// ============================
+// START
+// ============================
+
+(async function() {
+
+  const allowed = await checkAdmin();
+
+  if (allowed) {
+    await loadMessages();
+  }
+
+})();
+async function createWedding() {
+
+  const bride = document.getElementById("weddingBride").value.trim();
+  const groom = document.getElementById("weddingGroom").value.trim();
+  const date = document.getElementById("weddingDate").value;
+  const venue = document.getElementById("weddingVenue").value.trim();
+
+  if (!bride || !groom) {
+    alert("Nama pengantin wajib diisi.");
+    return;
+  }
+
+  const slug = (
+    bride + "-" + groom
+  )
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  const { error } = await supabaseClient
+    .from("Weddings")
+    .insert({
+      bride_name: bride,
+      groom_name: groom,
+      slug: slug,
+      wedding_date: date || null,
+      venue: venue || null,
+      template: "classic",
+      status: "active"
+    });
+
+  if (error) {
+    alert("Gagal membuat wedding: " + error.message);
+    return;
+  }
+
+  alert("Wedding berhasil ditambahkan!");
+
+  document.getElementById("weddingBride").value = "";
+  document.getElementById("weddingGroom").value = "";
+  document.getElementById("weddingDate").value = "";
+  document.getElementById("weddingVenue").value = "";
+}
+</script>
+<!-- ===== QR CODE WEDDING ===== -->
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+<div id="qrWeddingSection" style="
+  margin-top:40px;
+  background:white;
+  border:1px solid #ddd5cd;
+  border-radius:12px;
+  padding:24px;
+">
+
+  <h2>QR Code Wedding</h2>
+
+  <p style="color:#8a7e73;">
+    Buat QR Code khusus untuk setiap pasangan.
+  </p>
+
+  <div id="qrWeddingList"></div>
+
+</div>
+
+<script>
+  async function createGuest() {
+
+  const guestName =
+    document.getElementById("guestName").value.trim();
+
+  const guestCount =
+    Number(document.getElementById("guestCount").value);
+
+  const result =
+    document.getElementById("guestResult");
+
+  if (!guestName) {
+    result.innerHTML =
+      `<div style="color:#b00020;">
+        Nama tamu wajib diisi.
+      </div>`;
+    return;
+  }
+
+  if (!guestCount || guestCount < 1) {
+    result.innerHTML =
+      `<div style="color:#b00020;">
+        Jumlah tamu minimal 1.
+      </div>`;
+    return;
+  }
+
+  const qrToken =
+    "DG-" +
+    crypto.randomUUID().replaceAll("-", "").slice(0, 12).toUpperCase();
+
+  const { data, error } =
+    await supabaseClient
+      .from("guests")
+      .insert({
+        wedding_id: Number(document.getElementById("guestWedding").value),
+        guest_name: guestName,
+        guest_count: guestCount,
+        qr_token: qrToken
+      })
+      .select()
+      .single();
+
+  if (error) {
+    console.error(error);
+
+    result.innerHTML =
+      `<div style="color:#b00020;">
+        Gagal membuat data tamu.
+      </div>`;
+    return;
+  }
+
+  result.innerHTML = `
+    <div style="
+      margin-top:20px;
+      padding:20px;
+      background:#f8f5ef;
+      border:1px solid #d8c7a0;
+      border-radius:10px;
+      text-align:center;
+    ">
+
+      <h3>✓ TAMU BERHASIL DITAMBAHKAN</h3>
+
+      <strong>${escapeHTML(data.guest_name)}</strong>
+
+      <p>
+        Jumlah tamu: ${data.guest_count}
+      </p>
+
+      <div
+        id="guestQRCode"
+        style="
+          display:inline-block;
+          margin:15px 0;
+        "
+      ></div>
+
+      <p style="
+        font-size:13px;
+        color:#777;
+      ">
+        Token: ${escapeHTML(data.qr_token)}
+      </p>
+
+    </div>
+  `;
+
+  new QRCode(
+    document.getElementById("guestQRCode"),
+    {
+      text: data.qr_token,
+      width: 200,
+      height: 200
+    }
+  );
+
+  document.getElementById("guestName").value = "";
+  document.getElementById("guestCount").value = 1;
+}
+  async function loadGuestList() {
+
+  const weddingId =
+    Number(document.getElementById("guestListWedding").value);
+
+  const search =
+    document.getElementById("guestSearch").value
+      .trim()
+      .toLowerCase();
+
+  const container =
+    document.getElementById("guestList");
+
+  container.innerHTML = "Memuat daftar tamu...";
+
+  const { data, error } =
+    await supabaseClient
+      .from("guests")
+      .select("*")
+      .eq("wedding_id", weddingId)
+      .order("id", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    container.innerHTML =
+      "<p>Gagal memuat daftar tamu.</p>";
+    return;
+  }
+
+  const guests = (data || []).filter(guest =>
+    (guest.guest_name || "")
+      .toLowerCase()
+      .includes(search)
+  );
+
+  if (guests.length === 0) {
+    container.innerHTML =
+      "<p>Belum ada tamu.</p>";
+    return;
+  }
+
+  container.innerHTML = guests.map(guest => `
+    <div style="
+      padding:16px;
+      margin-bottom:12px;
+      border:1px solid #ddd;
+      border-radius:8px;
+      background:#fafafa;
+    ">
+
+      <strong>
+        ${escapeHTML(guest.guest_name)}
+      </strong>
+
+      <div style="margin-top:6px;">
+        Jumlah tamu: ${guest.guest_count}
+      </div>
+
+      <div style="
+        margin-top:6px;
+        color:${guest.checked_in ? "#39734a" : "#999"};
+      ">
+        ${guest.checked_in
+          ? "✓ Sudah Check-In"
+          : "○ Belum Check-In"}
+      </div>
+
+    </div>
+  `).join("");
+}
+async function loadWeddingQR() {
+
+  const { data, error } = await supabaseClient
+    .from("Weddings")
+    .select("id, bride_name, groom_name")
+    .order("id", { ascending: true });
+
+  const container = document.getElementById("qrWeddingList");
+
+  if (error) {
+    container.innerHTML = "<p>Gagal memuat wedding.</p>";
+    return;
+  }
+
+  container.innerHTML = "";
+
+  data.forEach(wedding => {
+
+    const card = document.createElement("div");
+
+    card.style.cssText = `
+      border:1px solid #ddd5cd;
+      border-radius:10px;
+      padding:20px;
+      margin-top:16px;
+      text-align:center;
+    `;
+
+    const title = document.createElement("h3");
+    title.textContent =
+      wedding.bride_name + " & " + wedding.groom_name;
+
+    const qrBox = document.createElement("div");
+
+    qrBox.style.cssText = `
+      display:flex;
+      justify-content:center;
+      margin:20px 0;
+    `;
+
+    const link = window.location.origin +
+"/D-guestbook/#wedding=" +
+wedding.id;
+
+    new QRCode(qrBox, {
+      text: link,
+      width: 180,
+      height: 180
+    });
+
+    const linkText = document.createElement("p");
+
+    linkText.style.cssText = `
+      font-size:13px;
+      word-break:break-all;
+      color:#777;
+    `;
+
+    linkText.textContent = link;
+
+    const copyButton = document.createElement("button");
+
+    copyButton.textContent = "Salin Link";
+
+    copyButton.style.cssText = `
+      padding:12px 20px;
+      border:0;
+      border-radius:8px;
+      cursor:pointer;
+      margin-top:8px;
+    `;
+
+    copyButton.onclick = async function() {
+
+      await navigator.clipboard.writeText(link);
+
+      copyButton.textContent = "✓ Link Tersalin";
+
+      setTimeout(() => {
+        copyButton.textContent = "Salin Link";
+      }, 2000);
+    };
+
+    card.appendChild(title);
+    card.appendChild(qrBox);
+    card.appendChild(linkText);
+    card.appendChild(copyButton);
+
+    container.appendChild(card);
+  });
+}
+async function loadCheckinStats() {
+
+  const select = document.getElementById("checkinWedding");
+
+  if (!select) return;
+
+  const { data: weddings, error: weddingError } =
+    await supabaseClient
+      .from("Weddings")
+      .select("id, bride_name, groom_name")
+      .order("id", { ascending: true });
+
+  if (weddingError) {
+    console.error("Gagal memuat wedding:", weddingError);
+    return;
+  }
+
+  select.innerHTML =
+    `<option value="">Pilih Wedding</option>`;
+
+  weddings.forEach(wedding => {
+
+    const option = document.createElement("option");
+
+    option.value = wedding.id;
+
+    option.textContent =
+      `${wedding.bride_name || ""} & ${wedding.groom_name || ""}`;
+
+    select.appendChild(option);
+
+  });
+
+  select.addEventListener("change", async function () {
+
+    const weddingId = Number(this.value);
+
+    if (!weddingId) {
+      document.getElementById("totalCheckinGuests").textContent = "0";
+      document.getElementById("checkedInGuests").textContent = "0";
+      document.getElementById("notCheckedInGuests").textContent = "0";
+      document.getElementById("totalPeopleCheckedIn").textContent = "0";
+      return;
+    }
+
+    const { data: guests, error } =
+      await supabaseClient
+        .from("guests")
+        .select("id, guest_name, guest_count, checked_in")
+        .eq("wedding_id", weddingId);
+
+    if (error) {
+      console.error("Gagal memuat statistik check-in:", error);
+      return;
+    }
+
+    const total = guests.length;
+
+    const checkedIn = guests.filter(
+      guest => guest.checked_in === true
+    );
+
+    const hadir = checkedIn.length;
+
+    const belumHadir = total - hadir;
+
+    const totalOrangHadir = checkedIn.reduce(
+      (sum, guest) => sum + Number(guest.guest_count || 0),
+      0
+    );
+
+    document.getElementById("totalCheckinGuests").textContent = total;
+
+    document.getElementById("checkedInGuests").textContent = hadir;
+
+    document.getElementById("notCheckedInGuests").textContent = belumHadir;
+
+    document.getElementById("totalPeopleCheckedIn").textContent =
+      totalOrangHadir;
+const guestListElement =
+  document.getElementById("checkinGuestList");
+
+guestListElement.innerHTML = guests.map(guest => `
+  <div class="dg-guest-row">
+    <div>
+      <div class="dg-guest-name">${escapeHTML(guest.guest_name || "-")}</div>
+      <div class="dg-guest-count">👤 ${guest.guest_count || 0} orang</div>
+    </div>
+    <div class="dg-status ${guest.checked_in ? "hadir" : "belum"}">
+      ${guest.checked_in ? "✓ HADIR" : "⌛ BELUM HADIR"}
+    </div>
+  </div>
+`).join("");
+  });
+
+}
+
+loadCheckinStats();
+loadWeddingQR();
+  loadGuestList();
+</script>
+</body>
+</html>
