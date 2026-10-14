@@ -259,23 +259,88 @@ input:focus,select:focus{border-color:var(--dg-gold)!important;box-shadow:0 0 0 
 @media(max-width:520px){.container{padding:0 13px 35px}.dg-checkin-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}.dg-checkin-stats .stat{padding:16px}.stat-number{font-size:29px}.dg-guest-row{align-items:flex-start;flex-direction:column}.dg-status{align-self:flex-start}.dg-section{border-radius:15px}}
 </style>
 
+
+<style id="dg-premium-upgrade">
+:root{
+  --dg-ink:#29251f;--dg-ink-2:#40372e;--dg-gold:#c3a064;--dg-gold-deep:#9d793e;
+  --dg-paper:#f7f4ee;--dg-card:#fffefa;--dg-line:#e7dfd2;--dg-muted:#81776c;
+  --dg-green:#2e7048;--dg-red:#a34747;--dg-shadow:0 16px 40px rgba(48,38,25,.07)
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:radial-gradient(ellipse at top right,#eee3cf 0,transparent 38%),var(--dg-paper);color:var(--dg-ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+header{background:linear-gradient(115deg,#211e1a,#43372b 65%,#5a4732);border-bottom:1px solid rgba(195,160,100,.42);box-shadow:0 10px 30px rgba(28,23,18,.14);padding:17px 20px}
+.header-inner{max-width:1240px}
+.logo{display:flex;align-items:center;gap:13px;font-size:13px;font-weight:800;letter-spacing:2.4px}
+.dg-logo-mark{display:grid;place-items:center;width:43px;height:43px;flex:0 0 43px;border:1px solid var(--dg-gold);border-radius:13px;background:linear-gradient(145deg,#3c3021,#211d18);color:#e2c17e;font-family:Georgia,serif;font-size:18px;letter-spacing:-2px;box-shadow:inset 0 0 0 3px rgba(195,160,100,.09)}
+.dg-brand-name{display:block;color:#fff}
+.dg-brand-caption{display:block;margin-top:4px;color:#d4bd91;font-size:9px;letter-spacing:2.1px;font-weight:600}
+.logout{border:1px solid rgba(226,193,126,.55);border-radius:10px;padding:10px 15px;transition:.2s}
+.logout:hover{background:rgba(255,255,255,.09)}
+.container{max-width:1240px;margin:32px auto;padding:0 20px 60px}
+h1{font-size:clamp(27px,4vw,37px);letter-spacing:-1px;margin:0 0 7px}
+h2{letter-spacing:-.35px}
+.subtitle{color:var(--dg-muted);margin:0;line-height:1.6}
+.dg-page-intro{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;padding:12px 0 8px}
+.dg-eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:2px;font-weight:800;color:var(--dg-gold-deep);margin-bottom:10px}
+.stats{gap:16px;margin:24px 0}
+.stat{background:linear-gradient(145deg,#fffefa,#fbf8f1);border:1px solid var(--dg-line);border-radius:17px;padding:23px;box-shadow:var(--dg-shadow);position:relative;overflow:hidden}
+.stat::after{content:"";position:absolute;width:105px;height:105px;right:-42px;top:-45px;border-radius:50%;border:1px solid rgba(195,160,100,.24);background:rgba(195,160,100,.06);pointer-events:none}
+.stat-label{font-size:12px;text-transform:uppercase;letter-spacing:.8px;font-weight:750;color:var(--dg-muted)}
+.stat-number{font-size:clamp(29px,3vw,38px);letter-spacing:-1px;line-height:1.15;margin-top:13px;color:var(--dg-ink)}
+.dg-section,.dg-panel{background:rgba(255,254,250,.96)!important;border:1px solid var(--dg-line)!important;border-radius:19px!important;padding:clamp(18px,3vw,28px)!important;margin-top:24px!important;box-shadow:var(--dg-shadow)}
+.dg-section-head{align-items:center;margin-bottom:21px}
+.dg-section-icon{background:linear-gradient(145deg,#f6ebd6,#eee0c3);color:#85662f;border:1px solid #e8d7b5;border-radius:13px}
+.dg-section-head h2,.dg-panel h2{font-size:20px}
+.dg-section-head p{font-size:13px}
+input,select,textarea{font:inherit!important;color:var(--dg-ink);background:#fffefa;border:1px solid #ded4c5!important;border-radius:10px!important;min-height:46px;transition:border-color .18s,box-shadow .18s}
+input,select{padding:13px 14px!important;width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--dg-gold)!important;box-shadow:0 0 0 3px rgba(195,160,100,.16)!important;outline:none}
+button{font:inherit;transition:transform .15s,filter .15s,background .15s}
+button:not(:disabled){cursor:pointer}
+button:hover{filter:brightness(1.04)}
+button:active{transform:translateY(1px)}
+button[onclick="createWedding()"],button[onclick="createGuest()"]{border-radius:10px!important;font-weight:750;letter-spacing:.15px}
+.refresh{border:1px solid #d8c7a7;background:#fffaf0;color:#71562b;border-radius:10px;padding:11px 15px;font-weight:700}
+.approve{background:var(--dg-ink-2);border-radius:9px;font-weight:700}
+.delete{border-radius:9px;font-weight:700}
+.message-card{background:var(--dg-card);border:1px solid var(--dg-line);border-radius:15px;padding:21px;box-shadow:0 5px 18px rgba(48,38,25,.035)}
+.message-card+.message-card{margin-top:13px}
+.guest-name{letter-spacing:-.2px}
+.message-text{color:#51483f}
+.status{font-weight:800;letter-spacing:.2px}
+.empty,.loading{border:1px dashed #d9cbb5;border-radius:14px;background:rgba(255,254,250,.75);padding:30px}
+.dg-guest-row{border-radius:12px!important}
+.dg-filter{margin-top:10px}
+#guestResult>div{border-radius:14px!important}
+#qrWeddingSection{margin-top:24px!important}
+#qrWeddingList>div{background:#fffefa;border:1px solid var(--dg-line)!important;border-radius:15px!important;box-shadow:0 5px 18px rgba(48,38,25,.04)}
+#qrWeddingList button{background:var(--dg-ink-2);color:white;border-radius:9px;padding:11px 17px}
+#errorBox:empty{display:none}
+.error{border:1px solid #eccaca;border-radius:12px}
+.dg-toolbar-note{font-size:12px;color:var(--dg-muted)}
+.dg-status.hadir{background:#e6f3e8;color:#286440}
+.dg-status.belum{background:#f8efdc;color:#88652b}
+@media(max-width:800px){.container{margin:23px auto}.dg-page-intro{align-items:flex-start;flex-direction:column}.stats{gap:11px}.stat{padding:18px}}
+@media(max-width:520px){header{padding:13px 14px}.container{padding:0 13px 40px}.logo{letter-spacing:1.3px}.dg-logo-mark{width:39px;height:39px;flex-basis:39px}.dg-brand-caption{font-size:8px}.logout{padding:9px 11px}.stat{padding:15px}.stat-number{font-size:28px}.dg-section,.dg-panel{border-radius:15px!important;padding:17px!important}.message-card{padding:16px}.toolbar{align-items:center}.toolbar h2{font-size:19px}}
+</style>
+
 </head>
 
 <body>
 
 <header>
   <div class="header-inner">
-    <div class="logo">D’GUESTBOOK ADMIN</div>
+    <div class="logo"><span class="dg-logo-mark" aria-label="DG">DG</span><span><span class="dg-brand-name">D’GUESTBOOK</span><span class="dg-brand-caption">PREMIUM GUEST EXPERIENCE · ADMIN</span></span></div>
     <button class="logout" onclick="logout()">Logout</button>
   </div>
 </header>
 
 <div class="container">
 
-  <h1>Admin Dashboard</h1>
+  <div class="dg-page-intro"><div><div class="dg-eyebrow">Workspace · Wedding Management</div><h1>Admin Dashboard</h1>
   <p class="subtitle">
-    Kelola ucapan tamu D’Guestbook
-  </p>
+    Kelola wedding, daftar tamu, kehadiran, dan ucapan dalam satu dashboard.</p></div><div class="dg-toolbar-note">SECURE ADMIN PANEL</div></div>
 <!-- ============================
      MANAJEMEN WEDDING
 ============================= -->
@@ -405,8 +470,7 @@ input:focus,select:focus{border-color:var(--dg-gold)!important;box-shadow:0 0 0 
       "
     >
       <option value="">Pilih Wedding</option>
-<option value="1">Cikal & Nadya</option>
-<option value="2">Sinta & Barba</option>
+<option value="">Memuat daftar wedding…</option>
     </select>
 
     <input
@@ -608,8 +672,7 @@ input:focus,select:focus{border-color:var(--dg-gold)!important;box-shadow:0 0 0 
         font-size:16px;
       "
     >
-      <option value="1">Cikal & Nadya</option>
-      <option value="2">Sinta & Barba</option>
+      <option value="">Memuat daftar wedding…</option>
     </select>
 
     <input
@@ -910,36 +973,22 @@ function escapeHTML(text) {
 // START
 // ============================
 
-(async function() {
-
-  const allowed = await checkAdmin();
-
-  if (allowed) {
-    await loadMessages();
-  }
-
-})();
 async function createWedding() {
-
   const bride = document.getElementById("weddingBride").value.trim();
   const groom = document.getElementById("weddingGroom").value.trim();
   const date = document.getElementById("weddingDate").value;
   const venue = document.getElementById("weddingVenue").value.trim();
-
   if (!bride || !groom) {
     alert("Nama pengantin wajib diisi.");
     return;
   }
-
-  const slug = (
-    bride + "-" + groom
-  )
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-
-  const { error } = await supabaseClient
-    .from("Weddings")
+  const slug = (bride + "-" + groom).toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  const button = document.querySelector('button[onclick="createWedding()"]');
+  if (button) { button.disabled = true; button.textContent = "Menyimpan…"; }
+  const { data, error } = await supabaseClient
+    .from("weddings")
     .insert({
       bride_name: bride,
       groom_name: groom,
@@ -948,19 +997,23 @@ async function createWedding() {
       venue: venue || null,
       template: "classic",
       status: "active"
-    });
-
+    })
+    .select("id, bride_name, groom_name")
+    .single();
+  if (button) { button.disabled = false; button.textContent = "+ Tambah Wedding"; }
   if (error) {
     alert("Gagal membuat wedding: " + error.message);
     return;
   }
-
   alert("Wedding berhasil ditambahkan!");
-
   document.getElementById("weddingBride").value = "";
   document.getElementById("weddingGroom").value = "";
   document.getElementById("weddingDate").value = "";
   document.getElementById("weddingVenue").value = "";
+  await loadWeddingOptions(data?.id);
+  await loadWeddingQR();
+  await loadGuestList();
+  await loadCheckinStats(data?.id);
 }
 </script>
 <!-- ===== QR CODE WEDDING ===== -->
@@ -986,6 +1039,50 @@ async function createWedding() {
 </div>
 
 <script>
+
+async function loadWeddingOptions(preferredId) {
+  const selectIds = ["guestWedding", "guestListWedding", "checkinWedding"];
+  const selects = selectIds.map(id => document.getElementById(id)).filter(Boolean);
+  const previous = {};
+  selects.forEach(sel => previous[sel.id] = sel.value);
+  selects.forEach(sel => {
+    sel.innerHTML = '<option value="">Memuat daftar wedding…</option>';
+    sel.disabled = true;
+  });
+  const { data: weddings, error } = await supabaseClient
+    .from("weddings")
+    .select("id, bride_name, groom_name, wedding_date, venue, status")
+    .order("id", { ascending: true });
+  if (error) {
+    console.error("Gagal memuat daftar wedding:", error);
+    selects.forEach(sel => {
+      sel.innerHTML = '<option value="">Gagal memuat wedding</option>';
+      sel.disabled = false;
+    });
+    const box = document.getElementById("errorBox");
+    if (box) box.innerHTML = '<div class="error">Daftar wedding tidak bisa dimuat dari Supabase. Periksa nama tabel <b>weddings</b> dan izin aksesnya. Detail: ' + escapeHTML(error.message) + '</div>';
+    return [];
+  }
+  const rows = weddings || [];
+  selects.forEach(sel => {
+    sel.innerHTML = '<option value="">Pilih Wedding</option>';
+    rows.forEach(w => {
+      const opt = document.createElement("option");
+      opt.value = String(w.id);
+      opt.textContent = `${w.bride_name || ""} & ${w.groom_name || ""}`.trim();
+      sel.appendChild(opt);
+    });
+    sel.disabled = rows.length === 0;
+    const desired = preferredId != null ? String(preferredId) : previous[sel.id];
+    if (desired && rows.some(w => String(w.id) === desired)) sel.value = desired;
+    else if (rows.length) sel.value = String(rows[0].id);
+    else sel.innerHTML = '<option value="">Belum ada wedding</option>';
+  });
+  const box = document.getElementById("errorBox");
+  if (box) box.innerHTML = "";
+  return rows;
+}
+
   async function createGuest() {
 
   const guestName =
@@ -993,9 +1090,15 @@ async function createWedding() {
 
   const guestCount =
     Number(document.getElementById("guestCount").value);
+  const weddingId = document.getElementById("guestWedding").value;
 
   const result =
     document.getElementById("guestResult");
+
+  if (!weddingId) {
+    result.innerHTML = `<div style="color:#b00020;">Pilih wedding terlebih dahulu.</div>`;
+    return;
+  }
 
   if (!guestName) {
     result.innerHTML =
@@ -1021,7 +1124,7 @@ async function createWedding() {
     await supabaseClient
       .from("guests")
       .insert({
-        wedding_id: Number(document.getElementById("guestWedding").value),
+        wedding_id: Number(weddingId),
         guest_name: guestName,
         guest_count: guestCount,
         qr_token: qrToken
@@ -1086,11 +1189,13 @@ async function createWedding() {
 
   document.getElementById("guestName").value = "";
   document.getElementById("guestCount").value = 1;
+  await loadGuestList();
+  await loadCheckinStats(weddingId);
 }
   async function loadGuestList() {
 
-  const weddingId =
-    Number(document.getElementById("guestListWedding").value);
+  const selectedWedding = document.getElementById("guestListWedding").value;
+  const weddingId = Number(selectedWedding);
 
   const search =
     document.getElementById("guestSearch").value
@@ -1100,6 +1205,7 @@ async function createWedding() {
   const container =
     document.getElementById("guestList");
 
+  if (!selectedWedding || !Number.isFinite(weddingId)) { container.innerHTML = "<p>Pilih wedding untuk melihat daftar tamu.</p>"; return; }
   container.innerHTML = "Memuat daftar tamu...";
 
   const { data, error } =
@@ -1160,7 +1266,7 @@ async function createWedding() {
 async function loadWeddingQR() {
 
   const { data, error } = await supabaseClient
-    .from("Weddings")
+    .from("weddings")
     .select("id, bride_name, groom_name")
     .order("id", { ascending: true });
 
@@ -1172,6 +1278,7 @@ async function loadWeddingQR() {
   }
 
   container.innerHTML = "";
+  if (!data || data.length === 0) { container.innerHTML = "<p>Belum ada wedding. Tambahkan wedding terlebih dahulu.</p>"; return; }
 
   data.forEach(wedding => {
 
@@ -1248,30 +1355,10 @@ wedding.id;
     container.appendChild(card);
   });
 }
-async function loadCheckinStats() {
+async function loadCheckinStats(preferredWeddingId) {
   const select = document.getElementById("checkinWedding");
   if (!select) return;
-
   const warning = document.getElementById("checkinWeddingWarning");
-  const fallbackWeddings = [
-    { id: 1, bride_name: "Cikal", groom_name: "Nadya" },
-    { id: 2, bride_name: "Sinta", groom_name: "Barba" }
-  ];
-
-  // Tampilkan pilihan langsung, tanpa menunggu koneksi Supabase.
-  function renderWeddingOptions(items, selectedId) {
-    select.innerHTML = '<option value="">Pilih Wedding</option>';
-    items.forEach(wedding => {
-      const option = document.createElement("option");
-      option.value = String(wedding.id);
-      option.textContent = `${wedding.bride_name || ""} & ${wedding.groom_name || ""}`;
-      select.appendChild(option);
-    });
-    const wanted = selectedId && items.some(w => String(w.id) === String(selectedId))
-      ? String(selectedId)
-      : (items.length ? String(items[0].id) : "");
-    select.value = wanted;
-  }
 
   async function updateStats(weddingId) {
     const ids = ["totalCheckinGuests", "checkedInGuests", "notCheckedInGuests", "totalPeopleCheckedIn"];
@@ -1281,79 +1368,60 @@ async function loadCheckinStats() {
       if (list) list.innerHTML = "<p>Pilih wedding untuk melihat daftar kehadiran.</p>";
       return;
     }
-
     ids.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = "…"; });
     try {
       const { data: guests, error } = await supabaseClient
         .from("guests")
         .select("id, guest_name, guest_count, checked_in")
         .eq("wedding_id", Number(weddingId));
-
       if (error) throw error;
       const rows = guests || [];
       const checked = rows.filter(guest => guest.checked_in === true);
       const total = rows.length;
       const hadir = checked.length;
       const orangHadir = checked.reduce((sum, guest) => sum + Number(guest.guest_count || 0), 0);
-
       document.getElementById("totalCheckinGuests").textContent = total;
       document.getElementById("checkedInGuests").textContent = hadir;
       document.getElementById("notCheckedInGuests").textContent = total - hadir;
       document.getElementById("totalPeopleCheckedIn").textContent = orangHadir;
-
       const list = document.getElementById("checkinGuestList");
-      if (list) {
-        list.innerHTML = rows.length ? rows.map(guest => `
-          <div class="dg-guest-row" data-guest-name="${escapeHTML(guest.guest_name || "-").toLowerCase()}">
-            <div>
-              <div class="dg-guest-name">${escapeHTML(guest.guest_name || "-")}</div>
-              <div class="dg-guest-count">👤 Jumlah tamu: ${Number(guest.guest_count || 0)} orang</div>
-            </div>
-            <div class="dg-status ${guest.checked_in ? "hadir" : "belum"}">
-              ${guest.checked_in ? "✓ HADIR" : "◷ BELUM HADIR"}
-            </div>
-          </div>
-        `).join("") : "<p>Belum ada tamu untuk wedding ini.</p>";
-      }
+      if (list) list.innerHTML = rows.length ? rows.map(guest => `
+        <div class="dg-guest-row" data-guest-name="${escapeHTML(guest.guest_name || "-").toLowerCase()}">
+          <div><div class="dg-guest-name">${escapeHTML(guest.guest_name || "-")}</div>
+          <div class="dg-guest-count">👤 Jumlah tamu: ${Number(guest.guest_count || 0)} orang</div></div>
+          <div class="dg-status ${guest.checked_in ? "hadir" : "belum"}">${guest.checked_in ? "✓ HADIR" : "◷ BELUM HADIR"}</div>
+        </div>`).join("") : "<p>Belum ada tamu untuk wedding ini.</p>";
       if (warning) warning.style.display = "none";
     } catch (err) {
       console.error("Gagal memuat statistik check-in:", err);
       if (warning) {
-        warning.textContent = "Pilihan wedding tersedia, tetapi statistik belum bisa dimuat. Periksa izin baca tabel guests di Supabase.";
+        warning.textContent = "Wedding berhasil dipilih, tetapi statistik belum bisa dimuat. Periksa izin baca tabel guests dan kolom checked_in di Supabase.";
         warning.style.display = "block";
       }
       ids.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = "!"; });
     }
   }
-
-  // Isi dropdown segera agar tidak terus berhenti pada “Pilih Wedding”.
-  renderWeddingOptions(fallbackWeddings, 1);
   select.onchange = () => updateStats(select.value);
+  if (preferredWeddingId != null) select.value = String(preferredWeddingId);
   await updateStats(select.value);
-
-  // Sinkronkan dengan daftar wedding asli jika Supabase merespons.
-  try {
-    const { data: weddings, error } = await supabaseClient
-      .from("Weddings")
-      .select("id, bride_name, groom_name")
-      .order("id", { ascending: true });
-    if (error) throw error;
-    if (weddings && weddings.length) {
-      const current = select.value;
-      renderWeddingOptions(weddings, current);
-      await updateStats(select.value);
-    }
-  } catch (err) {
-    console.error("Gagal memuat daftar wedding dari Supabase:", err);
-    if (warning) {
-      warning.textContent = "Daftar wedding sementara ditampilkan. Jika statistik bertanda !, periksa koneksi dan izin tabel guests di Supabase.";
-      warning.style.display = "block";
-    }
-  }
 }
-loadCheckinStats();
-loadWeddingQR();
-  loadGuestList();
+(async function initDashboardData() {
+  const allowed = await checkAdmin();
+  if (!allowed) return;
+  const weddings = await loadWeddingOptions();
+  await loadMessages();
+  await loadWeddingQR();
+  await loadCheckinStats();
+  await loadGuestList();
+  const guestWedding = document.getElementById("guestWedding");
+  if (guestWedding) guestWedding.addEventListener("change", () => {});
+  const guestListWedding = document.getElementById("guestListWedding");
+  if (guestListWedding) guestListWedding.addEventListener("change", loadGuestList);
+  if (!weddings.length) {
+    const list = document.getElementById("guestList");
+    if (list) list.innerHTML = "<p>Belum ada wedding. Tambahkan wedding terlebih dahulu.</p>";
+  }
+})();
 </script>
 </body>
 </html>
