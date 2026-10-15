@@ -1700,18 +1700,33 @@ async function importGuestExcel(){
  document.querySelectorAll(".dg-reference-filter").forEach(btn=>btn.addEventListener("click",()=>{activeFilter=btn.dataset.filter;document.querySelectorAll(".dg-reference-filter").forEach(b=>{b.style.background=b===btn?"#ad8745":"#fffefa";b.style.color=b===btn?"#fff":"#57584e";});render();}));
  $("dgRefExport").addEventListener("click",()=>{
    const rows=allGuests.filter(g=>(g.guest_name||"").toLowerCase().includes(($("dgRefSearch").value||"").trim().toLowerCase())&&(activeFilter==="all"||(activeFilter==="present"?g.checked_in===true:g.checked_in!==true)));
-   if(!selectedWeddingId){alert("Pilih wedding terlebih dahulu. Jika daftar kosong, tambahkan wedding lewat menu Wedding.");return;}
+   if(!selectedWeddingId){alert("Pilih wedding terlebih dahulu.");return;}
    if(!rows.length){alert("Tidak ada data tamu untuk diekspor pada filter ini.");return;}
+   const data=[["Nama Tamu","Kategori","Jumlah","Status","Waktu Check-in","QR Token"],...rows.map(g=>[g.guest_name||"",g.category||g.guest_category||"Reguler",Number(g.guest_count||1),g.checked_in?"Hadir":"Belum",g.checkin_time||g.checked_in_at||g.check_in_time||"",g.qr_token||""])];
+   try{
+     if(typeof XLSX!=="undefined"){
+       const ws=XLSX.utils.aoa_to_sheet(data);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Daftar Tamu");
+       XLSX.writeFile(wb,"daftar-tamu-dguestbook.xlsx");return;
+     }
+   }catch(err){console.warn("Excel export fallback",err);}
    const quote=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
-   const csv=[["Nama Tamu","Kategori","Jumlah","Status","Waktu Check-in","QR Token"],...rows.map(g=>[g.guest_name,g.category||g.guest_category||"Reguler",g.guest_count||1,g.checked_in?"Hadir":"Belum",g.checkin_time||g.checked_in_at||g.check_in_time||"",g.qr_token||""])].map(row=>row.map(quote).join(",")).join("\r\n");
+   const csv=data.map(row=>row.map(quote).join(",")).join("\r\n");
    const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"});
-   const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="daftar-tamu-dguestbook.csv";a.style.display="none";document.body.appendChild(a);a.click();
-   setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},1500);
- });
+   const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="daftar-tamu-dguestbook.csv";a.target="_blank";a.rel="noopener";document.body.appendChild(a);a.click();
+   setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},2000);
+ });;
  document.addEventListener("DOMContentLoaded",init);
 })();
 \n</script>
 
+<style id="dg-workspace-navigation-fixes">
+#qrWeddingSection{display:none!important;margin-top:24px!important}
+body.dg-view-wedding #qrWeddingSection{display:block!important}
+body.dg-view-dashboard #dg-reference-dashboard{display:block}
+#dgRefExport{touch-action:manipulation;-webkit-appearance:none;appearance:none;position:relative;z-index:2;pointer-events:auto}
+#dgReferenceWedding{pointer-events:auto;touch-action:manipulation;position:relative;z-index:10}
+@media(max-width:760px){#dgReferenceWedding{font-size:16px!important;line-height:1.3!important}#dgRefExport{min-height:46px;white-space:nowrap}}
+</style>
 <style id="dg-workspace-navigation-style">
 #dg-admin-sidebar .dg-side-nav a.dg-nav-active{background:#51483b;box-shadow:inset 4px 0 #c6a45c}
 body.dg-view-dashboard #dgWeddingManagement,body.dg-view-dashboard #dgGuestManagement,body.dg-view-dashboard #dgCheckinSection,body.dg-view-dashboard #dgMessagesSection,body.dg-view-dashboard #messageList,body.dg-view-dashboard .dg-attendance-list-section{display:none!important}
@@ -1776,6 +1791,9 @@ body.dg-view-messages #dg-reference-dashboard,body.dg-view-messages #dgWeddingMa
   '#dgMessagesSection':{cls:'dg-view-messages',title:'Ucapan Tamu'}
  };
  function init(){
+  const qrSection=document.getElementById('qrWeddingSection');
+  const weddingSection=document.getElementById('dgWeddingManagement');
+  if(qrSection&&weddingSection&&!weddingSection.contains(qrSection)) weddingSection.appendChild(qrSection);
   const links=[...document.querySelectorAll('#dg-admin-sidebar .dg-side-nav a')];
   const attendance=document.getElementById('checkinGuestList');
   if(attendance){
