@@ -381,6 +381,26 @@ hr{border:0;border-top:1px solid var(--dg-line)}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;scroll-behavior:auto!important}}
 </style>
 
+
+<style id="dgExcelImportStyles">
+.dg-excel-import{margin-top:18px;padding:22px;border:1px solid #e4d9bf;border-radius:18px;background:linear-gradient(145deg,#fffdf8,#f7f3e8)}
+.dg-excel-kicker{font-size:10px;letter-spacing:1.8px;font-weight:800;color:#98783b}
+.dg-excel-import h3{font-size:19px;margin:7px 0;color:#20382d}
+.dg-excel-import p,.dg-excel-hint{font-size:13px;line-height:1.6;color:#72796f}
+.dg-excel-actions{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 10px}
+.dg-excel-template,.dg-excel-upload{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:46px;padding:12px 15px;border-radius:11px;font-size:13px;font-weight:750;cursor:pointer}
+.dg-excel-template{background:#fff!important;color:#20382d!important;border:1px solid #d9cba9!important}
+.dg-excel-upload{background:#20382d;color:#fff}
+#guestExcelFile{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.dg-excel-hint{margin-top:9px}
+.dg-excel-preview-card{margin-top:16px;padding:15px;border:1px solid #e5dfd1;border-radius:13px;background:#fff;overflow:auto}
+.dg-excel-preview-card table{width:100%;border-collapse:collapse;font-size:12px}
+.dg-excel-preview-card th,.dg-excel-preview-card td{text-align:left;padding:9px;border-bottom:1px solid #eee9df;white-space:nowrap}
+.dg-excel-preview-card th{color:#816735;background:#faf7ef}
+.dg-excel-import-btn{margin-top:14px;background:#20382d!important;color:white!important;width:100%;min-height:48px;border-radius:11px!important;font-weight:750}
+.dg-excel-message{font-size:13px;line-height:1.6;margin-top:12px;padding:12px;border-radius:10px}
+@media(max-width:600px){.dg-excel-import{padding:17px}.dg-excel-actions>*{width:100%}}
+</style>
 </head>
 
 <body>
@@ -577,6 +597,20 @@ hr{border:0;border-top:1px solid var(--dg-line)}
   </div>
 
   <div id="guestResult" style="margin-top:20px;"></div>
+
+  <section id="dgExcelImport" class="dg-excel-import">
+    <div class="dg-excel-kicker">BULK GUEST REGISTRATION</div>
+    <h3>Import Daftar Tamu dari Excel</h3>
+    <p>Untuk ratusan tamu, unggah satu file Excel. Sistem membuat QR unik untuk setiap baris tamu yang valid.</p>
+    <div class="dg-excel-actions">
+      <button type="button" class="dg-excel-template" onclick="downloadGuestTemplate()">Unduh Template Excel</button>
+      <label class="dg-excel-upload" for="guestExcelFile"><span>＋</span> Pilih File Excel / CSV</label>
+      <input id="guestExcelFile" type="file" accept=".xlsx,.xls,.csv" onchange="previewGuestExcel(event)" />
+    </div>
+    <div class="dg-excel-hint">Kolom wajib: Nama Tamu · Jumlah Tamu (opsional: Kategori, Nomor Meja). Pilih wedding terlebih dahulu pada formulir Manajemen Tamu.</div>
+    <div id="guestExcelPreview" aria-live="polite"></div>
+  </section>
+
 
 </div>
 </div>
@@ -1478,6 +1512,60 @@ async function loadCheckinStats(preferredWeddingId) {
     if (list) list.innerHTML = "<p>Belum ada wedding. Tambahkan wedding terlebih dahulu.</p>";
   }
 })();
+</script>
+
+<!-- SheetJS for Excel import -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script id="dgExcelImportLogic">
+let dgExcelRows = [];
+function downloadGuestTemplate(){
+  const rows=[["Nama Tamu","Jumlah Tamu","Kategori","Nomor Meja"],["Budi Santoso",2,"Reguler","A1"],["Ibu Sari",3,"VIP","VIP-1"]];
+  if(typeof XLSX==="undefined"){alert("Fitur Excel belum termuat. Periksa koneksi internet lalu muat ulang halaman.");return;}
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  ws["!cols"]=[{wch:26},{wch:14},{wch:16},{wch:16}];
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Daftar Tamu");
+  XLSX.writeFile(wb,"template-daftar-tamu-dguestbook.xlsx");
+}
+function previewGuestExcel(event){
+  const file=event.target.files&&event.target.files[0];const box=document.getElementById("guestExcelPreview");
+  dgExcelRows=[];
+  if(!file)return;
+  if(!document.getElementById("guestWedding").value){box.innerHTML='<div class="dg-excel-message" style="background:#fff3d8;color:#765b25">Pilih wedding di formulir Manajemen Tamu terlebih dahulu.</div>';event.target.value="";return;}
+  if(typeof XLSX==="undefined"){box.innerHTML='<div class="dg-excel-message" style="background:#fff3d8;color:#765b25">Pembaca Excel belum termuat. Muat ulang halaman dan coba lagi.</div>';return;}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const wb=XLSX.read(e.target.result,{type:"array"});const sheet=wb.Sheets[wb.SheetNames[0]];
+      const raw=XLSX.utils.sheet_to_json(sheet,{defval:"",raw:false});
+      const norm=v=>String(v??"").trim().toLowerCase().replace(/[_-]+/g," ").replace(/\s+/g," ");
+      const pick=(row,keys)=>{const found=Object.keys(row).find(k=>keys.includes(norm(k)));return found===undefined?"":row[found];};
+      dgExcelRows=raw.map((row,index)=>({row:index+2,name:String(pick(row,["nama tamu","nama","guest name","guest name*"])).trim(),count:Number(pick(row,["jumlah tamu","jumlah","guest count","pax"])||1),category:String(pick(row,["kategori","category","jenis tamu"])||"Reguler").trim(),table:String(pick(row,["nomor meja","meja","table number","table"])||"").trim()})).filter(x=>x.name);
+      const bad=dgExcelRows.filter(x=>!Number.isInteger(x.count)||x.count<1);
+      if(!dgExcelRows.length){box.innerHTML='<div class="dg-excel-message" style="background:#fff3d8;color:#765b25">Nama tamu belum ditemukan. Gunakan template D’Guestbook agar judul kolom sesuai.</div>';return;}
+      const show=dgExcelRows.slice(0,8);
+      box.innerHTML='<div class="dg-excel-preview-card"><strong>Pratinjau impor</strong><p>'+dgExcelRows.length+' baris tamu ditemukan'+(bad.length?' · '+bad.length+' jumlah tamu tidak valid':'')+'. Periksa contoh di bawah sebelum menyimpan.</p><table><thead><tr><th>Nama</th><th>Jumlah</th><th>Kategori</th><th>Meja</th></tr></thead><tbody>'+show.map(x=>'<tr><td>'+escapeHTML(x.name)+'</td><td>'+x.count+'</td><td>'+escapeHTML(x.category)+'</td><td>'+escapeHTML(x.table||"-")+'</td></tr>').join("")+'</tbody></table>'+(dgExcelRows.length>8?'<p>Menampilkan 8 baris pertama.</p>':'')+'<button type="button" class="dg-excel-import-btn" onclick="importGuestExcel()">Simpan '+dgExcelRows.length+' Tamu & Buat QR Otomatis</button><div id="dgExcelImportStatus" aria-live="polite"></div></div>';
+    }catch(err){console.error(err);box.innerHTML='<div class="dg-excel-message" style="background:#fff0ed;color:#8b342a">File tidak bisa dibaca. Coba simpan sebagai .xlsx atau .csv.</div>';}
+  };
+  reader.readAsArrayBuffer(file);
+}
+async function importGuestExcel(){
+  const box=document.getElementById("dgExcelImportStatus");const weddingId=document.getElementById("guestWedding").value;
+  if(!weddingId){box.innerHTML='<div class="dg-excel-message" style="background:#fff3d8;color:#765b25">Pilih wedding terlebih dahulu.</div>';return;}
+  const valid=dgExcelRows.filter(x=>x.name&&Number.isInteger(x.count)&&x.count>0);
+  if(!valid.length){box.innerHTML='<div class="dg-excel-message" style="background:#fff3d8;color:#765b25">Tidak ada baris valid untuk disimpan.</div>';return;}
+  const btn=document.querySelector(".dg-excel-import-btn");if(btn)btn.disabled=true;
+  box.innerHTML='<div class="dg-excel-message" style="background:#f4f0e5;color:#4d5149">Menyimpan data tamu… jangan tutup halaman.</div>';
+  let inserted=0,failed=0;const errors=[];
+  for(let i=0;i<valid.length;i+=50){
+    const batch=valid.slice(i,i+50).map(x=>({wedding_id:Number(weddingId),guest_name:x.name,guest_count:x.count,qr_token:"DG-"+crypto.randomUUID().replaceAll("-","").slice(0,12).toUpperCase()}));
+    const {data,error}=await supabaseClient.from("guests").insert(batch).select("id");
+    if(error){failed+=batch.length;errors.push(error.message);console.error("Excel import error",error);}else{inserted+=data?.length??batch.length;}
+    box.innerHTML='<div class="dg-excel-message" style="background:#f4f0e5;color:#4d5149">Proses: '+Math.min(i+50,valid.length)+' / '+valid.length+' baris…</div>';
+  }
+  box.innerHTML='<div class="dg-excel-message" style="background:'+(failed?'#fff3d8':'#eaf4eb')+';color:'+(failed?'#765b25':'#285f3b')+'"><strong>'+inserted+' tamu berhasil disimpan.</strong>'+(failed?'<br>'+failed+' baris gagal disimpan. Pesan: '+escapeHTML(errors[0]||"Periksa izin database."):' QR unik telah dibuat untuk setiap tamu.')+'<br>Periksa Daftar Tamu di bawah untuk memastikan data.</div>';
+  if(btn)btn.disabled=false;
+  if(inserted){await loadGuestList();await loadCheckinStats(weddingId);}
+}
 </script>
 </body>
 </html>
