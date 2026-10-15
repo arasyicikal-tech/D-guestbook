@@ -401,9 +401,73 @@ hr{border:0;border-top:1px solid var(--dg-line)}
 .dg-excel-message{font-size:13px;line-height:1.6;margin-top:12px;padding:12px;border-radius:10px}
 @media(max-width:600px){.dg-excel-import{padding:17px}.dg-excel-actions>*{width:100%}}
 </style>
+
+<style id="dgAdminPremiumLayout">
+:root{--dg-admin-ink:#25221d;--dg-admin-green:#20382d;--dg-admin-gold:#ad8745;--dg-admin-paper:#f7f5f0;--dg-admin-line:#e9e4da}
+body{background:var(--dg-admin-paper)!important;color:#252720!important;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif!important}
+header{background:var(--dg-admin-ink)!important;position:relative;z-index:3;padding:15px 22px!important;margin-left:218px}
+.header-inner{max-width:none!important}
+.container{max-width:none!important;margin:0 0 0 218px!important;padding:28px clamp(16px,3vw,38px)!important}
+#dg-admin-sidebar{position:fixed;z-index:5;left:0;top:0;bottom:0;width:218px;background:linear-gradient(180deg,#29251f,#211f1a);padding:25px 13px;color:#fff;display:flex;flex-direction:column;gap:24px;overflow-y:auto}
+.dg-side-brand{font-family:Georgia,serif;font-size:24px;padding:0 10px 21px;border-bottom:1px solid #494239;color:#f8f1e5}
+.dg-side-brand small{display:block;font:700 9px/1.7 Arial,sans-serif;letter-spacing:1.6px;color:#c9b17c;margin-top:7px}
+.dg-side-nav{display:grid;gap:6px}
+.dg-side-nav a{display:flex;align-items:center;gap:11px;padding:12px 11px;border-radius:9px;color:#e8e2d8;text-decoration:none;font-size:13px;font-weight:600;transition:background .15s}
+.dg-side-nav a:hover,.dg-side-nav a:first-child{background:#51483b;color:#fff}
+.dg-side-nav a span{width:20px;text-align:center;color:#d5bd86}
+.dg-side-foot{margin-top:auto;padding:12px 10px;color:#b8b0a3;font-size:11px;line-height:1.6}
+.dg-page-intro{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:25px}
+.dg-page-intro h1{font-size:clamp(26px,3vw,34px);letter-spacing:-.7px;color:#22251f;margin:5px 0 8px}
+.dg-eyebrow{font-size:10px;letter-spacing:1.8px;color:#99783e;font-weight:800;text-transform:uppercase}
+.dg-toolbar-note{font-size:10px;letter-spacing:1.2px;color:#6b705f;border:1px solid #ddd5c4;background:#fffdf8;padding:10px 12px;border-radius:9px}
+h2{font-size:19px!important;color:#26392e!important;letter-spacing:-.25px}
+.container>div[style*="background:white"],.dg-section,.stat,.message-card{border:1px solid var(--dg-admin-line)!important;border-radius:15px!important;box-shadow:0 4px 16px rgba(45,38,27,.035)}
+.container>div[style*="background:white"]{padding:22px!important}
+.stat{padding:20px!important;min-height:115px}
+.stat-label{font-size:12px!important;color:#7b7b70!important}
+.stat-number{font-size:30px!important;color:#26392e!important}
+.stats{gap:12px!important}
+input,select,textarea{border-color:#e2ddd2!important;border-radius:10px!important;background:#fffefa!important}
+button{transition:transform .15s,opacity .15s}
+button:hover{opacity:.94}
+.dg-section{background:#fffefa;padding:22px;margin:22px 0}
+.dg-section-head{align-items:center}
+#dgCheckinSection{margin-top:24px}
+#guestList table{border-collapse:separate;border-spacing:0;width:100%;overflow:hidden;border:1px solid #ece6da;border-radius:12px}
+#guestList th{background:#f6f2e8;color:#6d603f;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+#guestList td,#guestList th{padding:12px 10px;border-bottom:1px solid #eee9df}
+#messageList{line-height:1.6}
+@media(max-width:760px){
+ #dg-admin-sidebar{position:relative;width:auto;top:auto;bottom:auto;padding:13px;gap:12px}
+ .dg-side-brand{padding:0 5px 10px;font-size:21px}
+ .dg-side-nav{display:flex;overflow-x:auto;gap:5px;padding-bottom:2px}
+ .dg-side-nav a{white-space:nowrap;padding:10px;font-size:12px}
+ .dg-side-nav a span{width:auto}
+ .dg-side-foot{display:none}
+ header{margin-left:0;padding:12px 16px!important}
+ .container{margin:0!important;padding:20px 13px!important}
+ .dg-page-intro{align-items:flex-start}
+ .dg-toolbar-note{display:none}
+ .stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .stat{padding:15px!important;min-height:100px}
+ .stat-number{font-size:26px!important}
+}
+</style>
 </head>
 
-<body>
+<body id="top">
+
+<aside id="dg-admin-sidebar">
+ <div class="dg-side-brand">D’Guestbook<small>PREMIUM GUEST EXPERIENCE</small></div>
+ <nav class="dg-side-nav" aria-label="Navigasi dashboard">
+  <a href="#top"><span>⌂</span>Dashboard</a>
+  <a href="#dgWeddingManagement"><span>♧</span>Wedding</a>
+  <a href="#dgGuestManagement"><span>♙</span>Daftar Tamu</a>
+  <a href="#dgCheckinSection"><span>✓</span>Check-in</a>
+  <a href="#dgMessagesSection"><span>▤</span>Ucapan Tamu</a>
+ </nav>
+ <div class="dg-side-foot">DG · Guest management made elegant</div>
+</aside>
 
 <header>
   <div class="header-inner">
@@ -421,7 +485,7 @@ hr{border:0;border-top:1px solid var(--dg-line)}
      MANAJEMEN WEDDING
 ============================= -->
 
-<div style="margin-top:35px;">
+<div id="dgWeddingManagement" style="margin-top:35px;">
 
   <div style="
     background:white;
@@ -514,7 +578,7 @@ hr{border:0;border-top:1px solid var(--dg-line)}
 <!-- MANAJEMEN TAMU -->
 <!-- ============================= -->
 
-<div style="
+<div id="dgGuestManagement" style="
   margin-top:35px;
   background:white;
   border:1px solid #d8c7a0;
@@ -721,7 +785,7 @@ hr{border:0;border-top:1px solid var(--dg-line)}
   </div>
 
 </div>
-  <div class="toolbar">
+  <div id="dgMessagesSection" class="toolbar">
     <h2>Ucapan Tamu</h2>
     <button class="refresh" onclick="loadMessages()">
       ↻ Refresh
