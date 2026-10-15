@@ -988,7 +988,7 @@ async function createWedding() {
   const button = document.querySelector('button[onclick="createWedding()"]');
   if (button) { button.disabled = true; button.textContent = "Menyimpan…"; }
   const { data, error } = await supabaseClient
-    .from("weddings")
+    .from("Weddings")
     .insert({
       bride_name: bride,
       groom_name: groom,
@@ -1050,7 +1050,7 @@ async function loadWeddingOptions(preferredId) {
     sel.disabled = true;
   });
   const { data: weddings, error } = await supabaseClient
-    .from("weddings")
+    .from("Weddings")
     .select("id, bride_name, groom_name, wedding_date, venue, status")
     .order("id", { ascending: true });
   if (error) {
@@ -1266,7 +1266,7 @@ async function loadWeddingOptions(preferredId) {
 async function loadWeddingQR() {
 
   const { data, error } = await supabaseClient
-    .from("weddings")
+    .from("Weddings")
     .select("id, bride_name, groom_name")
     .order("id", { ascending: true });
 
