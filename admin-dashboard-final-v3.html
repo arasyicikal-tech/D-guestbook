@@ -475,6 +475,41 @@ button:hover{opacity:.94}
  .dg-page-intro{padding-bottom:15px}
 }
 </style>
+
+<style id="dgReferenceDashboardStyles">
+.dg-reference-dashboard{margin:0 0 28px;display:grid;gap:18px}
+.dg-reference-top{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.dg-reference-top h2{margin:0!important;font-size:25px!important;color:#25221d!important}
+.dg-reference-top p{margin:6px 0 0;color:#858074;font-size:13px}
+.dg-reference-wedding{min-width:180px;max-width:100%;padding:12px 14px!important;border:1px solid #e4ded2!important;border-radius:10px!important}
+.dg-reference-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
+.dg-reference-stat{background:#fffefa;border:1px solid #eee8dd;border-radius:13px;padding:17px;min-width:0;box-shadow:0 3px 12px #32271608}
+.dg-reference-stat-head{display:flex;align-items:center;gap:9px;font-size:12px;color:#7e7b70}
+.dg-reference-stat-icon{width:32px;height:32px;display:grid;place-items:center;border-radius:10px;background:#f3ecdf;color:#98753d;font-size:17px}
+.dg-reference-stat strong{display:block;font-size:27px;color:#1e211d;margin:11px 0 4px}
+.dg-reference-stat small{color:#858276;font-size:11px}
+.dg-reference-progress{height:5px;background:#eeeae1;border-radius:99px;overflow:hidden;margin-top:12px}
+.dg-reference-progress span{display:block;height:100%;background:#43845d;border-radius:99px}
+.dg-reference-table-card{background:#fffefa;border:1px solid #ebe5da;border-radius:15px;overflow:hidden}
+.dg-reference-table-head{padding:18px 20px;border-bottom:1px solid #eee8dc;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.dg-reference-table-head h3{margin:0;color:#2a3029;font-size:17px}
+.dg-reference-table-tools{padding:14px 18px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.dg-reference-search{flex:1;min-width:150px;padding:11px 13px!important}
+.dg-reference-filter{padding:10px 13px;border:1px solid #e4ddcf;border-radius:9px;background:#fffefa;color:#57584e;font-size:12px;font-weight:650}
+.dg-reference-export{background:#ad8745!important;color:white!important;border:0!important;border-radius:9px!important;padding:11px 15px!important;font-weight:750}
+.dg-reference-table-wrap{overflow-x:auto}
+.dg-reference-table{width:100%;border-collapse:collapse;white-space:nowrap;font-size:12px}
+.dg-reference-table th{background:#f7f4ed;color:#77705f;font-size:10px;letter-spacing:.45px;text-transform:uppercase;font-weight:750}
+.dg-reference-table th,.dg-reference-table td{padding:13px 15px;text-align:left;border-bottom:1px solid #eee9e0}
+.dg-reference-table tbody tr:hover{background:#fcfaf5}
+.dg-reference-badge{display:inline-block;padding:5px 9px;border-radius:99px;font-size:10px;font-weight:750;background:#f1ecdf;color:#77633b}
+.dg-reference-badge.present{background:#e0f0e5;color:#2d7045}
+.dg-reference-badge.absent{background:#fae8e8;color:#a14b4b}
+.dg-reference-empty{padding:28px;text-align:center;color:#858074;font-size:13px}
+#dgWeddingManagement,#dgGuestManagement{scroll-margin-top:18px}
+@media(max-width:900px){.dg-reference-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.dg-reference-top h2{font-size:22px!important}.dg-reference-stats{gap:9px}.dg-reference-stat{padding:13px}.dg-reference-stat strong{font-size:24px}.dg-reference-stat-head{font-size:11px}.dg-reference-table-head{padding:15px}.dg-reference-table-tools{padding:12px}}
+</style>
 </head>
 
 <body id="top">
@@ -819,61 +854,23 @@ button:hover{opacity:.94}
   </div>
 
 </div>
-<!-- DAFTAR TAMU -->
-<div style="
-  margin-top:35px;
-  background:white;
-  border:1px solid #d8c7a0;
-  border-radius:10px;
-  padding:24px;
-">
 
-  <h2 style="margin-top:0;">
-    Daftar Tamu
-  </h2>
-
-  <div style="
-    display:grid;
-    gap:12px;
-    margin-top:20px;
-  ">
-
-    <select
-  id="guestListWedding"
-  onchange="loadGuestList()"
-      style="
-        padding:14px;
-        border:1px solid #ccc;
-        border-radius:6px;
-        font-size:16px;
-      "
-    >
-      <option value="">Memuat daftar wedding…</option>
-    </select>
-
-    <input
-      id="guestSearch"
-      type="text"
-      placeholder="Cari nama tamu..."
-      style="
-        padding:14px;
-        border:1px solid #ccc;
-        border-radius:6px;
-        font-size:16px;
-      "
-      oninput="loadGuestList()"
-    >
-
-  </div>
-
-  <div
-    id="guestList"
-    style="margin-top:20px;"
-  >
-    Memuat daftar tamu...
-  </div>
-
-</div>
+<!-- REFERENCE-STYLE DASHBOARD -->
+<section id="dg-reference-dashboard" class="dg-reference-dashboard">
+ <div class="dg-reference-top"><div><div class="dg-eyebrow">Ringkasan operasional</div><h2>Dashboard</h2><p>Ringkasan data tamu dan ucapan</p></div><select id="dgReferenceWedding" class="dg-reference-wedding" aria-label="Pilih wedding"><option value="">Pilih Wedding</option></select></div>
+ <div class="dg-reference-stats">
+  <div class="dg-reference-stat"><div class="dg-reference-stat-head"><span class="dg-reference-stat-icon">♙</span>Total Tamu</div><strong id="dgRefTotal">0</strong><small>Undangan terdaftar</small></div>
+  <div class="dg-reference-stat"><div class="dg-reference-stat-head"><span class="dg-reference-stat-icon" style="background:#e6f2e8;color:#388154">✓</span>Sudah Check-in</div><strong id="dgRefPresent">0</strong><small id="dgRefPresentPct">0% dari total tamu</small><div class="dg-reference-progress"><span id="dgRefProgress" style="width:0%"></span></div></div>
+  <div class="dg-reference-stat"><div class="dg-reference-stat-head"><span class="dg-reference-stat-icon" style="background:#fae9e9;color:#bd5656">◷</span>Belum Check-in</div><strong id="dgRefAbsent">0</strong><small>Belum tercatat hadir</small></div>
+  <div class="dg-reference-stat"><div class="dg-reference-stat-head"><span class="dg-reference-stat-icon" style="background:#e8eff8;color:#4b729a">▤</span>Total Ucapan</div><strong id="dgRefMessages">0</strong><small>Ucapan untuk wedding ini</small></div>
+ </div>
+ <div class="dg-reference-table-card">
+  <div class="dg-reference-table-head"><div><h3>Daftar Tamu</h3><p style="margin:5px 0 0;color:#858074;font-size:12px">Cari tamu, pantau status, dan ekspor data.</p></div></div>
+  <div class="dg-reference-table-tools"><input id="dgRefSearch" class="dg-reference-search" type="search" placeholder="⌕  Cari nama tamu..." aria-label="Cari nama tamu"><button type="button" class="dg-reference-filter" data-filter="all">Semua</button><button type="button" class="dg-reference-filter" data-filter="present">Sudah Hadir</button><button type="button" class="dg-reference-filter" data-filter="absent">Belum Hadir</button><button type="button" id="dgRefExport" class="dg-reference-export">↓ Export</button></div>
+  <div class="dg-reference-table-wrap"><table class="dg-reference-table"><thead><tr><th>Nama Tamu</th><th>Kategori</th><th>Jumlah</th><th>Status</th><th>Waktu Check-in</th><th>Aksi</th></tr></thead><tbody id="dgRefGuestRows"><tr><td colspan="6" class="dg-reference-empty">Pilih wedding untuk melihat daftar tamu.</td></tr></tbody></table></div>
+  <div id="dgRefGuestCount" style="padding:12px 16px;color:#858074;font-size:11px">0 tamu</div>
+ </div>
+</section>
 <script>
 
 const SUPABASE_URL = "https://yeyckoekpqadrbvmetta.supabase.co";
@@ -1653,5 +1650,51 @@ async function importGuestExcel(){
   if(inserted){await loadGuestList();await loadCheckinStats(weddingId);}
 }
 </script>
+
+<script id="dgReferenceDashboardLogic">
+(function(){
+ let allGuests=[], activeFilter="all", selectedWeddingId="";
+ const $=id=>document.getElementById(id);
+ const safeText=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+ const formatTime=v=>{if(!v)return "—";const d=new Date(v);return Number.isNaN(d.getTime())?safeText(v):d.toLocaleString("id-ID",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});};
+ async function init(){
+   const {data,error}=await supabaseClient.from("Weddings").select("id, bride_name, groom_name").order("id",{ascending:true});
+   const selects=[$("dgReferenceWedding"),$("guestListWedding"),$("guestWedding"),$("checkinWedding")].filter(Boolean);
+   if(error){$("dgRefGuestRows").innerHTML='<tr><td colspan="6" class="dg-reference-empty">Daftar wedding gagal dimuat. Periksa koneksi dan izin baca Supabase.</td></tr>';return;}
+   selects.forEach(sel=>{const previous=sel.value;sel.innerHTML='<option value="">Pilih Wedding</option>'+(data||[]).map(w=>'<option value="'+safeText(w.id)+'">'+safeText((w.bride_name||"")+' & '+(w.groom_name||""))+'</option>').join("");if(previous)sel.value=previous;});
+   const query=new URLSearchParams(location.search).get("wedding");
+   if(query&&data?.some(w=>String(w.id)===query))$("dgReferenceWedding").value=query;
+   else if(data?.length)$("dgReferenceWedding").value=String(data[0].id);
+   const chosen=$("dgReferenceWedding").value;
+   if(chosen){selects.forEach(sel=>sel.value=chosen);await refresh();}
+ }
+ async function refresh(){
+   selectedWeddingId=$("dgReferenceWedding").value;
+   [$("dgRefTotal"),$("dgRefPresent"),$("dgRefAbsent"),$("dgRefMessages")].forEach(el=>el.textContent="…");
+   if(!selectedWeddingId){allGuests=[];render();return;}
+   const {data,error}=await supabaseClient.from("guests").select("*").eq("wedding_id",Number(selectedWeddingId)).order("id",{ascending:false});
+   if(error){$("dgRefGuestRows").innerHTML='<tr><td colspan="6" class="dg-reference-empty">Gagal memuat tamu. Periksa izin baca tabel guests.</td></tr>';return;}
+   allGuests=data||[];
+   const present=allGuests.filter(g=>g.checked_in===true).length,total=allGuests.length,pct=total?Math.round(present/total*100):0;
+   $("dgRefTotal").textContent=total;$("dgRefPresent").textContent=present;$("dgRefAbsent").textContent=total-present;
+   $("dgRefPresentPct").textContent=pct+"% dari total tamu";$("dgRefProgress").style.width=pct+"%";
+   const {count,error:msgError}=await supabaseClient.from("messages").select("*",{count:"exact",head:true}).eq("wedding_id",Number(selectedWeddingId));
+   $("dgRefMessages").textContent=msgError?"—":(count??0);
+   render();
+ }
+ function render(){
+   const q=($("dgRefSearch").value||"").trim().toLowerCase();
+   const rows=allGuests.filter(g=>(g.guest_name||"").toLowerCase().includes(q)&&(activeFilter==="all"||(activeFilter==="present"?g.checked_in===true:g.checked_in!==true)));
+   $("dgRefGuestCount").textContent=rows.length+" dari "+allGuests.length+" tamu";
+   $("dgRefGuestRows").innerHTML=rows.length?rows.map(g=>'<tr><td><strong>'+safeText(g.guest_name||"—")+'</strong></td><td><span class="dg-reference-badge">'+safeText(g.category||g.guest_category||"Reguler")+'</span></td><td>'+Number(g.guest_count||1)+'</td><td><span class="dg-reference-badge '+(g.checked_in?'present':'absent')+'">'+(g.checked_in?'Hadir':'Belum')+'</span></td><td>'+formatTime(g.checkin_time||g.checked_in_at||g.check_in_time)+'</td><td>—</td></tr>').join(""):'<tr><td colspan="6" class="dg-reference-empty">Tidak ada tamu yang cocok dengan pencarian atau filter.</td></tr>';
+ }
+ $("dgReferenceWedding").addEventListener("change",async()=>{const id=$("dgReferenceWedding").value;[$("guestListWedding"),$("guestWedding"),$("checkinWedding")].forEach(sel=>{if(sel)sel.value=id;});await refresh();if(typeof loadGuestList==="function")await loadGuestList();if(typeof loadCheckinStats==="function")await loadCheckinStats(id);});
+ $("dgRefSearch").addEventListener("input",render);
+ document.querySelectorAll(".dg-reference-filter").forEach(btn=>btn.addEventListener("click",()=>{activeFilter=btn.dataset.filter;document.querySelectorAll(".dg-reference-filter").forEach(b=>{b.style.background=b===btn?"#ad8745":"#fffefa";b.style.color=b===btn?"#fff":"#57584e";});render();}));
+ $("dgRefExport").addEventListener("click",()=>{const rows=allGuests.filter(g=>(g.guest_name||"").toLowerCase().includes(($("dgRefSearch").value||"").trim().toLowerCase())&&(activeFilter==="all"||(activeFilter==="present"?g.checked_in===true:g.checked_in!==true)));const quote=v=>'"'+String(v??"").replace(/"/g,'""')+'"';const csv=[["Nama Tamu","Kategori","Jumlah","Status","Waktu Check-in","QR Token"],...rows.map(g=>[g.guest_name,g.category||g.guest_category||"Reguler",g.guest_count||1,g.checked_in?"Hadir":"Belum",g.checkin_time||g.checked_in_at||g.check_in_time||"",g.qr_token||""])].map(row=>row.map(quote).join(",")).join("\r\n");const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="daftar-tamu-dguestbook.csv";a.click();URL.revokeObjectURL(url);});
+ document.addEventListener("DOMContentLoaded",init);
+})();
+</script>
+
 </body>
 </html>
