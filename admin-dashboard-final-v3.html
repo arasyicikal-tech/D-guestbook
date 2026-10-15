@@ -1704,7 +1704,29 @@ body.dg-view-wedding #dg-reference-dashboard,body.dg-view-wedding #dgGuestManage
 body.dg-view-guests #dg-reference-dashboard,body.dg-view-guests #dgWeddingManagement,body.dg-view-guests #dgCheckinSection,body.dg-view-guests #dgMessagesSection,body.dg-view-guests #messageList,body.dg-view-guests .dg-attendance-list-section{display:none!important}
 body.dg-view-checkin #dg-reference-dashboard,body.dg-view-checkin #dgWeddingManagement,body.dg-view-checkin #dgGuestManagement,body.dg-view-checkin #dgMessagesSection,body.dg-view-checkin #messageList{display:none!important}
 body.dg-view-messages #dg-reference-dashboard,body.dg-view-messages #dgWeddingManagement,body.dg-view-messages #dgGuestManagement,body.dg-view-messages #dgCheckinSection,body.dg-view-messages .dg-attendance-list-section{display:none!important}
-@media(max-width:760px){#dg-reference-dashboard .dg-reference-table-wrap{overflow-x:auto}#dg-reference-dashboard .dg-reference-table{min-width:680px}}
+#dg-reference-dashboard .dg-reference-table-wrap{max-width:100%;overflow-x:auto}
+@media(max-width:760px){
+ #dg-admin-sidebar{position:relative!important;inset:auto!important;width:100%!important;height:auto!important;max-height:none!important;padding:14px!important;display:block!important;overflow:visible!important}
+ .dg-side-brand{font-size:22px!important;padding:0 8px 12px!important;margin-bottom:12px}
+ .dg-side-nav{display:flex!important;flex-wrap:nowrap!important;gap:7px!important;overflow-x:auto!important;overflow-y:hidden!important;padding:2px 0 8px!important;-webkit-overflow-scrolling:touch}
+ .dg-side-nav a{flex:0 0 auto!important;white-space:nowrap!important;padding:11px 13px!important;font-size:13px!important}
+ .dg-side-foot{display:none!important}
+ .container{width:100%!important;max-width:100%!important;margin:0!important;padding:22px 14px 38px!important;min-width:0!important}
+ header{padding:13px 14px!important}
+ .header-inner{width:100%!important;min-width:0!important;gap:10px!important}
+ .dg-page-intro{align-items:flex-start!important;flex-wrap:wrap!important}
+ #dg-reference-dashboard{width:100%!important;min-width:0!important;overflow:hidden}
+ #dg-reference-dashboard .dg-reference-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #dg-reference-dashboard .dg-reference-table-wrap{overflow-x:auto!important;max-width:100%!important}
+ #dg-reference-dashboard .dg-reference-table{min-width:650px}
+ .dg-section,.dg-reference-card,.dg-reference-panel{max-width:100%!important;min-width:0!important}
+ input,select,textarea{max-width:100%}
+}
+@media(max-width:420px){
+ .container{padding-left:10px!important;padding-right:10px!important}
+ #dg-reference-dashboard .dg-reference-stats{gap:9px!important}
+ #dg-reference-dashboard .dg-reference-stat{padding:13px!important}
+}
 </style>\n
 
 <script id="dgWorkspaceNavigation">
