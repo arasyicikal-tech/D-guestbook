@@ -1695,7 +1695,10 @@ async function importGuestExcel(){
  $("dgRefExport").addEventListener("click",()=>{const rows=allGuests.filter(g=>(g.guest_name||"").toLowerCase().includes(($("dgRefSearch").value||"").trim().toLowerCase())&&(activeFilter==="all"||(activeFilter==="present"?g.checked_in===true:g.checked_in!==true)));const quote=v=>'"'+String(v??"").replace(/"/g,'""')+'"';const csv=[["Nama Tamu","Kategori","Jumlah","Status","Waktu Check-in","QR Token"],...rows.map(g=>[g.guest_name,g.category||g.guest_category||"Reguler",g.guest_count||1,g.checked_in?"Hadir":"Belum",g.checkin_time||g.checked_in_at||g.check_in_time||"",g.qr_token||""])].map(row=>row.map(quote).join(",")).join("\r\n");const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="daftar-tamu-dguestbook.csv";a.click();URL.revokeObjectURL(url);});
  document.addEventListener("DOMContentLoaded",init);
 })();
-\n<style id="dg-workspace-navigation-style">\n#dg-admin-sidebar .dg-side-nav a.dg-nav-active{background:#51483b;box-shadow:inset 4px 0 #c6a45c;}\n#dg-reference-dashboard{margin-bottom:28px;}\n@media(max-width:760px){#dg-admin-sidebar{position:sticky;top:0;z-index:50;} .dg-reference-stats{grid-template-columns:repeat(2,minmax(0,1fr));} .dg-reference-table-wrap{overflow-x:auto;} .dg-reference-table{min-width:680px;}}\n</style>\n
+\n</script>
+
+<style id="dg-workspace-navigation-style">\n#dg-admin-sidebar .dg-side-nav a.dg-nav-active{background:#51483b;box-shadow:inset 4px 0 #c6a45c;}\n#dg-reference-dashboard{margin-bottom:28px;}\n@media(max-width:760px){#dg-admin-sidebar{position:sticky;top:0;z-index:50;} .dg-reference-stats{grid-template-columns:repeat(2,minmax(0,1fr));} .dg-reference-table-wrap{overflow-x:auto;} .dg-reference-table{min-width:680px;}}\n</style>\n
+
 <script id="dgWorkspaceNavigation">
 (function(){
  const links=[...document.querySelectorAll('#dg-admin-sidebar .dg-side-nav a')];
@@ -1721,7 +1724,6 @@ async function importGuestExcel(){
  // Start in the dashboard view rather than exposing every management section in one long page.
  document.addEventListener('DOMContentLoaded',()=>show('#top'));
 })();
-</script>
 </script>
 
 </body>
