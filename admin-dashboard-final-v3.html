@@ -1697,7 +1697,11 @@ async function importGuestExcel(){
 })();
 \n</script>
 
-<style id="dg-workspace-navigation-style">\n#dg-admin-sidebar .dg-side-nav a.dg-nav-active{background:#51483b;box-shadow:inset 4px 0 #c6a45c;}\n#dg-reference-dashboard{margin-bottom:28px;}\n@media(max-width:760px){#dg-admin-sidebar{position:sticky;top:0;z-index:50;} .dg-reference-stats{grid-template-columns:repeat(2,minmax(0,1fr));} .dg-reference-table-wrap{overflow-x:auto;} .dg-reference-table{min-width:680px;}}\n</style>\n
+<style id="dg-workspace-navigation-style">
+#dg-admin-sidebar .dg-side-nav a.dg-nav-active{background:#51483b;box-shadow:inset 4px 0 #c6a45c}
+#dg-reference-dashboard{margin-bottom:28px}
+@media(max-width:760px){#dg-reference-dashboard .dg-reference-table-wrap{overflow-x:auto}#dg-reference-dashboard .dg-reference-table{min-width:680px}}
+</style>\n
 
 <script id="dgWorkspaceNavigation">
 (function(){
@@ -1711,18 +1715,27 @@ async function importGuestExcel(){
  };
  const allIds=[...new Set(Object.values(panels).flat())];
  function show(target){
-  const wanted=panels[target]||panels['#top'];
-  allIds.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=wanted.includes(id)?'':'none';});
-  // Hide legacy dashboard cards and unrelated loose content while using the workspace tabs.
-  const intro=document.querySelector('.dg-page-intro'); if(intro)intro.style.display='';
-  const reference=document.getElementById('dg-reference-dashboard');
-  if(reference)reference.style.display=wanted.includes('dg-reference-dashboard')?'':'none';
-  links.forEach(a=>a.classList.toggle('dg-nav-active',a.getAttribute('href')===target));
-  window.scrollTo({top:0,behavior:'auto'});
+  const key=panels[target]?target:'#top';
+  const wanted=panels[key];
+  allIds.forEach(id=>{
+   const el=document.getElementById(id);
+   if(el) el.style.display=wanted.includes(id)?'':'none';
+  });
+  const intro=document.querySelector('.dg-page-intro');
+  if(intro) intro.style.display=key==='#top'?'':'none';
+  // Keep the workspace focused: hide other top-level sections by default.
+  const ref=document.getElementById('dg-reference-dashboard');
+  if(ref) ref.style.display=key==='#top'?'':'none';
+  links.forEach(a=>a.classList.toggle('dg-nav-active',a.getAttribute('href')===key));
+  if(location.hash!==key) history.replaceState(null,'',key);
+  window.scrollTo(0,0);
  }
- links.forEach(a=>a.addEventListener('click',e=>{const href=a.getAttribute('href');if(panels[href]){e.preventDefault();show(href);}}));
- // Start in the dashboard view rather than exposing every management section in one long page.
- document.addEventListener('DOMContentLoaded',()=>show('#top'));
+ links.forEach(a=>a.addEventListener('click',e=>{
+  const href=a.getAttribute('href');
+  if(panels[href]){e.preventDefault();show(href);}
+ }));
+ function init(){show(panels[location.hash]?location.hash:'#top');}
+ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true}); else init();
 })();
 </script>
 
