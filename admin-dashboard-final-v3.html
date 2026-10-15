@@ -452,6 +452,28 @@ button:hover{opacity:.94}
  .stat{padding:15px!important;min-height:100px}
  .stat-number{font-size:26px!important}
 }
+
+/* Reference-match refinement: spacious ivory workspace, dark navigation, gold accents */
+.dg-admin-sidebar{box-shadow:5px 0 24px rgba(20,18,14,.08)}
+.dg-side-nav a{border:1px solid transparent}
+.dg-side-nav a:first-child{box-shadow:inset 3px 0 #c6a45e}
+.dg-page-intro{padding:7px 0 20px;border-bottom:1px solid #e8e2d7}
+.container .stats{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+.container .stat{background:#fffefa!important;position:relative;overflow:hidden}
+.container .stat:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:#c2a363;opacity:.65}
+.container .stat-number{font-size:29px!important;letter-spacing:-.7px}
+.dg-section{box-shadow:0 7px 22px rgba(35,30,20,.035)!important}
+#dgGuestManagement,#dgWeddingManagement{background:#fffefa!important}
+#dgGuestManagement h2:before{content:"♙";display:inline-flex;align-items:center;justify-content:center;width:31px;height:31px;margin-right:10px;border-radius:9px;background:#f3ecdc;color:#98743b;font-size:16px}
+#dgCheckinSection .dg-section-head h2,#dgMessagesSection h2{letter-spacing:-.45px}
+#guestList{overflow-x:auto}
+#guestList table tbody tr:hover{background:#fcfaf5}
+.dg-excel-import{box-shadow:inset 0 1px rgba(255,255,255,.8)}
+@media(max-width:760px){
+ .container .stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .dg-side-nav a:first-child{box-shadow:none}
+ .dg-page-intro{padding-bottom:15px}
+}
 </style>
 </head>
 
