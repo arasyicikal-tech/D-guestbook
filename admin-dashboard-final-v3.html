@@ -1661,8 +1661,14 @@ async function importGuestExcel(){
  async function init(){
    const {data,error}=await supabaseClient.from("Weddings").select("id, bride_name, groom_name").order("id",{ascending:true});
    const selects=[$("dgReferenceWedding"),$("guestListWedding"),$("guestWedding"),$("checkinWedding")].filter(Boolean);
-   if(error){$("dgRefGuestRows").innerHTML='<tr><td colspan="6" class="dg-reference-empty">Daftar wedding gagal dimuat. Periksa koneksi dan izin baca Supabase.</td></tr>';return;}
-   selects.forEach(sel=>{const previous=sel.value;sel.innerHTML='<option value="">Pilih Wedding</option>'+(data||[]).map(w=>'<option value="'+safeText(w.id)+'">'+safeText((w.bride_name||"")+' & '+(w.groom_name||""))+'</option>').join("");if(previous)sel.value=previous;});
+   if(error){
+     const msg='Daftar wedding gagal dimuat: '+(error.message||'periksa koneksi dan izin Supabase');
+     $("dgRefGuestRows").innerHTML='<tr><td colspan="6" class="dg-reference-empty">'+safeText(msg)+'</td></tr>';
+     const box=$("errorBox"); if(box) box.innerHTML='<div class="error">'+safeText(msg)+'</div>';
+     selects.forEach(sel=>{sel.innerHTML='<option value="">Gagal memuat wedding</option>';sel.disabled=false;});
+     return;
+   }
+   selects.forEach(sel=>{const previous=sel.value;sel.innerHTML='<option value="">'+((data||[]).length?'Pilih Wedding':'Belum ada wedding — tambah di menu Wedding')+'</option>'+(data||[]).map(w=>'<option value="'+safeText(w.id)+'">'+safeText((w.bride_name||"")+' & '+(w.groom_name||""))+'</option>').join("");sel.disabled=false;if(previous&&(data||[]).some(w=>String(w.id)===previous))sel.value=previous;});
    const query=new URLSearchParams(location.search).get("wedding");
    if(query&&data?.some(w=>String(w.id)===query))$("dgReferenceWedding").value=query;
    else if(data?.length)$("dgReferenceWedding").value=String(data[0].id);
@@ -1692,7 +1698,16 @@ async function importGuestExcel(){
  $("dgReferenceWedding").addEventListener("change",async()=>{const id=$("dgReferenceWedding").value;[$("guestListWedding"),$("guestWedding"),$("checkinWedding")].forEach(sel=>{if(sel)sel.value=id;});await refresh();if(typeof loadGuestList==="function")await loadGuestList();if(typeof loadCheckinStats==="function")await loadCheckinStats(id);});
  $("dgRefSearch").addEventListener("input",render);
  document.querySelectorAll(".dg-reference-filter").forEach(btn=>btn.addEventListener("click",()=>{activeFilter=btn.dataset.filter;document.querySelectorAll(".dg-reference-filter").forEach(b=>{b.style.background=b===btn?"#ad8745":"#fffefa";b.style.color=b===btn?"#fff":"#57584e";});render();}));
- $("dgRefExport").addEventListener("click",()=>{const rows=allGuests.filter(g=>(g.guest_name||"").toLowerCase().includes(($("dgRefSearch").value||"").trim().toLowerCase())&&(activeFilter==="all"||(activeFilter==="present"?g.checked_in===true:g.checked_in!==true)));const quote=v=>'"'+String(v??"").replace(/"/g,'""')+'"';const csv=[["Nama Tamu","Kategori","Jumlah","Status","Waktu Check-in","QR Token"],...rows.map(g=>[g.guest_name,g.category||g.guest_category||"Reguler",g.guest_count||1,g.checked_in?"Hadir":"Belum",g.checkin_time||g.checked_in_at||g.check_in_time||"",g.qr_token||""])].map(row=>row.map(quote).join(",")).join("\r\n");const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="daftar-tamu-dguestbook.csv";a.click();URL.revokeObjectURL(url);});
+ $("dgRefExport").addEventListener("click",()=>{
+   const rows=allGuests.filter(g=>(g.guest_name||"").toLowerCase().includes(($("dgRefSearch").value||"").trim().toLowerCase())&&(activeFilter==="all"||(activeFilter==="present"?g.checked_in===true:g.checked_in!==true)));
+   if(!selectedWeddingId){alert("Pilih wedding terlebih dahulu. Jika daftar kosong, tambahkan wedding lewat menu Wedding.");return;}
+   if(!rows.length){alert("Tidak ada data tamu untuk diekspor pada filter ini.");return;}
+   const quote=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+   const csv=[["Nama Tamu","Kategori","Jumlah","Status","Waktu Check-in","QR Token"],...rows.map(g=>[g.guest_name,g.category||g.guest_category||"Reguler",g.guest_count||1,g.checked_in?"Hadir":"Belum",g.checkin_time||g.checked_in_at||g.check_in_time||"",g.qr_token||""])].map(row=>row.map(quote).join(",")).join("\r\n");
+   const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"});
+   const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="daftar-tamu-dguestbook.csv";a.style.display="none";document.body.appendChild(a);a.click();
+   setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},1500);
+ });
  document.addEventListener("DOMContentLoaded",init);
 })();
 \n</script>
