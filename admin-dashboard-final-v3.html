@@ -1699,43 +1699,48 @@ async function importGuestExcel(){
 
 <style id="dg-workspace-navigation-style">
 #dg-admin-sidebar .dg-side-nav a.dg-nav-active{background:#51483b;box-shadow:inset 4px 0 #c6a45c}
-#dg-reference-dashboard{margin-bottom:28px}
+body.dg-view-dashboard #dgWeddingManagement,body.dg-view-dashboard #dgGuestManagement,body.dg-view-dashboard #dgCheckinSection,body.dg-view-dashboard #dgMessagesSection,body.dg-view-dashboard #messageList,body.dg-view-dashboard .dg-attendance-list-section{display:none!important}
+body.dg-view-wedding #dg-reference-dashboard,body.dg-view-wedding #dgGuestManagement,body.dg-view-wedding #dgCheckinSection,body.dg-view-wedding #dgMessagesSection,body.dg-view-wedding #messageList,body.dg-view-wedding .dg-attendance-list-section{display:none!important}
+body.dg-view-guests #dg-reference-dashboard,body.dg-view-guests #dgWeddingManagement,body.dg-view-guests #dgCheckinSection,body.dg-view-guests #dgMessagesSection,body.dg-view-guests #messageList,body.dg-view-guests .dg-attendance-list-section{display:none!important}
+body.dg-view-checkin #dg-reference-dashboard,body.dg-view-checkin #dgWeddingManagement,body.dg-view-checkin #dgGuestManagement,body.dg-view-checkin #dgMessagesSection,body.dg-view-checkin #messageList{display:none!important}
+body.dg-view-messages #dg-reference-dashboard,body.dg-view-messages #dgWeddingManagement,body.dg-view-messages #dgGuestManagement,body.dg-view-messages #dgCheckinSection,body.dg-view-messages .dg-attendance-list-section{display:none!important}
 @media(max-width:760px){#dg-reference-dashboard .dg-reference-table-wrap{overflow-x:auto}#dg-reference-dashboard .dg-reference-table{min-width:680px}}
 </style>\n
 
 <script id="dgWorkspaceNavigation">
 (function(){
- const links=[...document.querySelectorAll('#dg-admin-sidebar .dg-side-nav a')];
- const panels={
-  '#top':['dg-reference-dashboard'],
-  '#dgWeddingManagement':['dgWeddingManagement'],
-  '#dgGuestManagement':['dgGuestManagement'],
-  '#dgCheckinSection':['dgCheckinSection'],
-  '#dgMessagesSection':['dgMessagesSection','messageList']
+ const routes={
+  '#top':{cls:'dg-view-dashboard',title:'Dashboard'},
+  '#dgWeddingManagement':{cls:'dg-view-wedding',title:'Wedding'},
+  '#dgGuestManagement':{cls:'dg-view-guests',title:'Daftar Tamu'},
+  '#dgCheckinSection':{cls:'dg-view-checkin',title:'Check-in'},
+  '#dgMessagesSection':{cls:'dg-view-messages',title:'Ucapan Tamu'}
  };
- const allIds=[...new Set(Object.values(panels).flat())];
- function show(target){
-  const key=panels[target]?target:'#top';
-  const wanted=panels[key];
-  allIds.forEach(id=>{
-   const el=document.getElementById(id);
-   if(el) el.style.display=wanted.includes(id)?'':'none';
-  });
-  const intro=document.querySelector('.dg-page-intro');
-  if(intro) intro.style.display=key==='#top'?'':'none';
-  // Keep the workspace focused: hide other top-level sections by default.
-  const ref=document.getElementById('dg-reference-dashboard');
-  if(ref) ref.style.display=key==='#top'?'':'none';
-  links.forEach(a=>a.classList.toggle('dg-nav-active',a.getAttribute('href')===key));
-  if(location.hash!==key) history.replaceState(null,'',key);
-  window.scrollTo(0,0);
+ function init(){
+  const links=[...document.querySelectorAll('#dg-admin-sidebar .dg-side-nav a')];
+  const attendance=document.getElementById('checkinGuestList');
+  if(attendance){
+   let p=attendance;
+   while(p&&p!==document.body){
+    if(p.classList&&p.classList.contains('dg-section')){p.classList.add('dg-attendance-list-section');break;}
+    p=p.parentElement;
+   }
+  }
+  function show(hash){
+   const key=routes[hash]?hash:'#top';
+   document.body.classList.remove(...Object.values(routes).map(x=>x.cls));
+   document.body.classList.add(routes[key].cls);
+   links.forEach(a=>a.classList.toggle('dg-nav-active',a.getAttribute('href')===key));
+   const intro=document.querySelector('.dg-page-intro');
+   if(intro)intro.style.display=key==='#top'?'':'none';
+   if(location.hash!==key)history.replaceState(null,'',key);
+   window.scrollTo({top:0,behavior:'auto'});
+  }
+  links.forEach(a=>a.addEventListener('click',e=>{const h=a.getAttribute('href');if(routes[h]){e.preventDefault();show(h);}}));
+  window.addEventListener('hashchange',()=>show(location.hash));
+  show(location.hash);
  }
- links.forEach(a=>a.addEventListener('click',e=>{
-  const href=a.getAttribute('href');
-  if(panels[href]){e.preventDefault();show(href);}
- }));
- function init(){show(panels[location.hash]?location.hash:'#top');}
- if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true}); else init();
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 </script>
 
