@@ -1700,29 +1700,25 @@ async function importGuestExcel(){
    $("dgRefGuestCount").textContent=rows.length+" dari "+allGuests.length+" tamu";
    $("dgRefGuestRows").innerHTML=rows.length?rows.map(g=>'<tr><td><strong>'+safeText(g.guest_name||"—")+'</strong></td><td><span class="dg-reference-badge">'+safeText(g.category||g.guest_category||"Reguler")+'</span></td><td>'+Number(g.guest_count||1)+'</td><td><span class="dg-reference-badge '+(g.checked_in?'present':'absent')+'">'+(g.checked_in?'Hadir':'Belum')+'</span></td><td>'+formatTime(g.checkin_time||g.checked_in_at||g.check_in_time)+'</td><td>—</td></tr>').join(""):'<tr><td colspan="6" class="dg-reference-empty">Tidak ada tamu yang cocok dengan pencarian atau filter.</td></tr>';
  }
- $("dgReferenceWedding").addEventListener("change",async()=>{const id=$("dgReferenceWedding").value;[$("guestListWedding"),$("guestWedding"),$("checkinWedding")].forEach(sel=>{if(sel)sel.value=id;});await refresh();if(typeof loadGuestList==="function")await loadGuestList();if(typeof loadCheckinStats==="function")await loadCheckinStats(id);});
+ $("dgReferenceWedding").addEventListener("change",async()=>{const id=$("dgReferenceWedding").value;selectedWeddingId=id;[$("guestListWedding"),$("guestWedding"),$("checkinWedding")].forEach(sel=>{if(sel){sel.value=id;sel.disabled=false;}});await refresh();if(typeof loadGuestList==="function")await loadGuestList();if(typeof loadCheckinStats==="function")await loadCheckinStats(id);});
  $("dgRefSearch").addEventListener("input",render);
  document.querySelectorAll(".dg-reference-filter").forEach(btn=>btn.addEventListener("click",()=>{activeFilter=btn.dataset.filter;document.querySelectorAll(".dg-reference-filter").forEach(b=>{b.style.background=b===btn?"#ad8745":"#fffefa";b.style.color=b===btn?"#fff":"#57584e";});render();}));
  $("dgRefExport").addEventListener("click",()=>{
+   const weddingId=$("dgReferenceWedding").value;
+   if(!weddingId){alert("Pilih wedding pada dropdown Dashboard terlebih dahulu.");$("dgReferenceWedding").focus();return;}
+   selectedWeddingId=weddingId;
    const rows=allGuests.filter(g=>(g.guest_name||"").toLowerCase().includes(($("dgRefSearch").value||"").trim().toLowerCase())&&(activeFilter==="all"||(activeFilter==="present"?g.checked_in===true:g.checked_in!==true)));
-   if(!selectedWeddingId){alert("Pilih wedding terlebih dahulu.");return;}
-   if(!rows.length){alert("Tidak ada data tamu untuk diekspor pada filter ini.");return;}
+   if(!rows.length){alert("Tidak ada data tamu untuk diekspor pada wedding/filter ini.");return;}
    const data=[["Nama Tamu","Kategori","Jumlah","Status","Waktu Check-in","QR Token"],...rows.map(g=>[g.guest_name||"",g.category||g.guest_category||"Reguler",Number(g.guest_count||1),g.checked_in?"Hadir":"Belum",g.checkin_time||g.checked_in_at||g.check_in_time||"",g.qr_token||""])];
-   let downloaded=false;
+   const quote=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+   const csv="\\ufeff"+data.map(row=>row.map(quote).join(",")).join("\\r\\n");
    try{
-     if(typeof XLSX!=="undefined"){
-       const ws=XLSX.utils.aoa_to_sheet(data);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Daftar Tamu");
-       XLSX.writeFile(wb,"daftar-tamu-dguestbook.xlsx");downloaded=true;
-     }
-   }catch(err){console.warn("Excel export fallback",err);}
-   if(!downloaded){
-     const quote=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
-     const csv=data.map(row=>row.map(quote).join(",")).join("\r\n");
-     const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"});
-     const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="daftar-tamu-dguestbook.csv";a.target="_blank";a.rel="noopener";document.body.appendChild(a);a.click();
-     setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},2000);
-   }
- });;
+     const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
+     const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="daftar-tamu-dguestbook.csv";a.target="_blank";a.rel="noopener";
+     a.style.position="fixed";a.style.left="-9999px";document.body.appendChild(a);a.click();
+     setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},10000);
+   }catch(err){console.error("Export error",err);window.open("data:text/csv;charset=utf-8,"+encodeURIComponent(csv),"_blank");}
+ });
  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
 })();
 \n</script>
@@ -1829,5 +1825,10 @@ body.dg-view-messages #dg-reference-dashboard,body.dg-view-messages #dgWeddingMa
 })();
 </script>
 
+<style id="dg-ios-select-export-fix">
+#dgReferenceWedding,#dgRefExport{pointer-events:auto!important;touch-action:manipulation!important;position:relative!important;z-index:50!important}
+#dgReferenceWedding{display:block!important;width:100%!important;min-height:48px!important;background:#fffefa!important;color:#26352d!important}
+#dgRefExport{display:inline-flex!important;min-height:48px!important;align-items:center!important;justify-content:center!important;cursor:pointer!important}
+</style>
 </body>
 </html>
