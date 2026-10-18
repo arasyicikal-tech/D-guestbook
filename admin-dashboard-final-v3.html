@@ -1715,7 +1715,7 @@ async function importGuestExcel(){
    const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="daftar-tamu-dguestbook.csv";a.target="_blank";a.rel="noopener";document.body.appendChild(a);a.click();
    setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},2000);
  });;
- document.addEventListener("DOMContentLoaded",init);
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
 })();
 \n</script>
 
