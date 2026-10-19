@@ -1664,8 +1664,8 @@ async function importGuestExcel(){
  const safeText=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
  const formatTime=v=>{if(!v)return "—";const d=new Date(v);return Number.isNaN(d.getTime())?safeText(v):d.toLocaleString("id-ID",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});};
  async function init(){
-   const {data,error}=await supabaseClient.from("Weddings").select("id, bride_name, groom_name").order("id",{ascending:true});
    const selects=[$("dgReferenceWedding"),$("guestListWedding"),$("guestWedding"),$("checkinWedding")].filter(Boolean);
+   const {data:weddings,error}=await supabaseClient.from("Weddings").select("id, bride_name, groom_name").order("id",{ascending:true});
    if(error){
      const msg='Daftar wedding gagal dimuat: '+(error.message||'periksa koneksi dan izin Supabase');
      $("dgRefGuestRows").innerHTML='<tr><td colspan="6" class="dg-reference-empty">'+safeText(msg)+'</td></tr>';
@@ -1673,12 +1673,31 @@ async function importGuestExcel(){
      selects.forEach(sel=>{sel.innerHTML='<option value="">Gagal memuat wedding</option>';sel.disabled=false;});
      return;
    }
-   selects.forEach(sel=>{const previous=sel.value;sel.innerHTML='<option value="">'+((data||[]).length?'Pilih Wedding':'Belum ada wedding — tambah di menu Wedding')+'</option>'+(data||[]).map(w=>'<option value="'+safeText(w.id)+'">'+safeText((w.bride_name||"")+' & '+(w.groom_name||""))+'</option>').join("");sel.disabled=false;if(previous&&(data||[]).some(w=>String(w.id)===previous))sel.value=previous;});
+   let rows=(weddings||[]).map(w=>({id:String(w.id),label:((w.bride_name||"")+' & '+(w.groom_name||"")).trim()||('Wedding #'+w.id)}));
+   // Recover existing guest wedding IDs when Weddings table is empty; do not alter database.
+   if(!rows.length){
+     const {data:guestRows,error:guestErr}=await supabaseClient.from("guests").select("wedding_id").not("wedding_id","is",null);
+     if(!guestErr){
+       const ids=[...new Set((guestRows||[]).map(g=>String(g.wedding_id)).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
+       rows=ids.map(id=>({id,label:'Wedding #'+id+' · data tamu tersedia'}));
+     }
+   }
+   selects.forEach(sel=>{
+     const previous=sel.value;
+     sel.innerHTML='<option value="">'+(rows.length?'Pilih Wedding':'Belum ada wedding atau data tamu')+'</option>'+rows.map(w=>'<option value="'+safeText(w.id)+'">'+safeText(w.label)+'</option>').join("");
+     sel.disabled=rows.length===0;
+     if(previous&&rows.some(w=>w.id===previous))sel.value=previous;
+   });
    const query=new URLSearchParams(location.search).get("wedding");
-   if(query&&data?.some(w=>String(w.id)===query))$("dgReferenceWedding").value=query;
-   else if(data?.length)$("dgReferenceWedding").value=String(data[0].id);
+   if(query&&rows.some(w=>w.id===query))$("dgReferenceWedding").value=query;
+   else if(rows.length)$("dgReferenceWedding").value=rows[0].id;
    const chosen=$("dgReferenceWedding").value;
-   if(chosen){selects.forEach(sel=>sel.value=chosen);await refresh();}
+   if(chosen){
+     selects.forEach(sel=>{sel.value=chosen;});
+     await refresh();
+   }else{
+     $("dgRefGuestRows").innerHTML='<tr><td colspan="6" class="dg-reference-empty">Belum ada wedding atau data tamu yang dapat dipilih.</td></tr>';
+   }
  }
  async function refresh(){
    selectedWeddingId=$("dgReferenceWedding").value;
@@ -1711,7 +1730,7 @@ async function importGuestExcel(){
    if(!rows.length){alert("Tidak ada data tamu untuk diekspor pada wedding/filter ini.");return;}
    const data=[["Nama Tamu","Kategori","Jumlah","Status","Waktu Check-in","QR Token"],...rows.map(g=>[g.guest_name||"",g.category||g.guest_category||"Reguler",Number(g.guest_count||1),g.checked_in?"Hadir":"Belum",g.checkin_time||g.checked_in_at||g.check_in_time||"",g.qr_token||""])];
    const quote=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
-   const csv="\\ufeff"+data.map(row=>row.map(quote).join(",")).join("\\r\\n");
+   const csv="\ufeff"+data.map(row=>row.map(quote).join(",")).join("\r\n");
    try{
      const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
      const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="daftar-tamu-dguestbook.csv";a.target="_blank";a.rel="noopener";
