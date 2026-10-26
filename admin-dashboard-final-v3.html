@@ -1684,39 +1684,44 @@ async function importGuestExcel(){
  const safeText=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
  const formatTime=v=>{if(!v)return "—";const d=new Date(v);return Number.isNaN(d.getTime())?safeText(v):d.toLocaleString("id-ID",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});};
  async function init(){
+   const dashboardSelect=$("dgReferenceWedding");
    const selects=[$("dgReferenceWedding"),$("guestListWedding"),$("guestWedding"),$("checkinWedding")].filter(Boolean);
-   const {data:weddings,error}=await supabaseClient.from("Weddings").select("id, bride_name, groom_name").order("id",{ascending:true});
-   if(error){
-     const msg='Daftar wedding gagal dimuat: '+(error.message||'periksa koneksi dan izin Supabase');
+   // Use the same wedding loader as the working guest/check-in screens, rather than
+   // running a competing Supabase request during session restoration on iOS Safari.
+   let weddings=[];
+   try{
+     if(typeof checkAdmin==="function"){
+       const allowed=await checkAdmin();
+       if(!allowed)return;
+     }
+     if(typeof loadWeddingOptions==="function"){
+       weddings=await loadWeddingOptions();
+     }else{
+       const {data,error}=await supabaseClient.from("Weddings").select("id, bride_name, groom_name").order("id",{ascending:true});
+       if(error)throw error;
+       weddings=data||[];
+     }
+   }catch(err){
+     const msg='Daftar wedding gagal dimuat: '+(err.message||'periksa koneksi dan izin Supabase');
      $("dgRefGuestRows").innerHTML='<tr><td colspan="6" class="dg-reference-empty">'+safeText(msg)+'</td></tr>';
      const box=$("errorBox"); if(box) box.innerHTML='<div class="error">'+safeText(msg)+'</div>';
-     selects.forEach(sel=>{sel.innerHTML='<option value="">Gagal memuat wedding</option>';sel.disabled=false;});
+     dashboardSelect.innerHTML='<option value="">Gagal memuat wedding</option>';
      return;
    }
-   let rows=(weddings||[]).map(w=>({id:String(w.id),label:((w.bride_name||"")+' & '+(w.groom_name||"")).trim()||('Wedding #'+w.id)}));
-   // Recover existing guest wedding IDs when Weddings table is empty; do not alter database.
-   if(!rows.length){
-     const {data:guestRows,error:guestErr}=await supabaseClient.from("guests").select("wedding_id").not("wedding_id","is",null);
-     if(!guestErr){
-       const ids=[...new Set((guestRows||[]).map(g=>String(g.wedding_id)).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
-       rows=ids.map(id=>({id,label:'Wedding #'+id+' · data tamu tersedia'}));
-     }
-   }
-   selects.forEach(sel=>{
-     const previous=sel.value;
-     sel.innerHTML='<option value="">'+(rows.length?'Pilih Wedding':'Belum ada wedding atau data tamu')+'</option>'+rows.map(w=>'<option value="'+safeText(w.id)+'">'+safeText(w.label)+'</option>').join("");
-     sel.disabled=rows.length===0;
-     if(previous&&rows.some(w=>w.id===previous))sel.value=previous;
-   });
+   const rows=(weddings||[]).map(w=>({id:String(w.id),label:((w.bride_name||"")+' & '+(w.groom_name||"")).trim()||('Wedding #'+w.id)}));
+   const previous=dashboardSelect.value;
+   dashboardSelect.innerHTML='<option value="">'+(rows.length?'Pilih Wedding':'Belum ada wedding')+'</option>'+rows.map(w=>'<option value="'+safeText(w.id)+'">'+safeText(w.label)+'</option>').join("");
+   dashboardSelect.disabled=rows.length===0;
    const query=new URLSearchParams(location.search).get("wedding");
-   if(query&&rows.some(w=>w.id===query))$("dgReferenceWedding").value=query;
-   else if(rows.length)$("dgReferenceWedding").value=rows[0].id;
-   const chosen=$("dgReferenceWedding").value;
+   if(query&&rows.some(w=>w.id===query))dashboardSelect.value=query;
+   else if(previous&&rows.some(w=>w.id===previous))dashboardSelect.value=previous;
+   else if(rows.length)dashboardSelect.value=rows[0].id;
+   const chosen=dashboardSelect.value;
    if(chosen){
-     selects.forEach(sel=>{sel.value=chosen;});
+     [$("guestListWedding"),$("guestWedding"),$("checkinWedding")].forEach(sel=>{if(sel){sel.value=chosen;sel.disabled=false;}});
      await refresh();
    }else{
-     $("dgRefGuestRows").innerHTML='<tr><td colspan="6" class="dg-reference-empty">Belum ada wedding atau data tamu yang dapat dipilih.</td></tr>';
+     $("dgRefGuestRows").innerHTML='<tr><td colspan="6" class="dg-reference-empty">Belum ada wedding yang dapat dipilih.</td></tr>';
    }
  }
  async function refresh(){
