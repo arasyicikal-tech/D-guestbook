@@ -1690,17 +1690,14 @@ async function importGuestExcel(){
    // running a competing Supabase request during session restoration on iOS Safari.
    let weddings=[];
    try{
-     if(typeof checkAdmin==="function"){
-       const allowed=await checkAdmin();
-       if(!allowed)return;
-     }
-     if(typeof loadWeddingOptions==="function"){
-       weddings=await loadWeddingOptions();
-     }else{
-       const {data,error}=await supabaseClient.from("Weddings").select("id, bride_name, groom_name").order("id",{ascending:true});
-       if(error)throw error;
-       weddings=data||[];
-     }
+     // Authentication is already checked by the page's primary initializer.
+     // Do not run a second auth/RPC check here; on mobile Safari it can race and
+     // leave this separate dashboard selector in its initial empty state.
+     const {data,error}=await supabaseClient.from("Weddings").select("id, bride_name, groom_name").order("id",{ascending:true});
+     if(error)throw error;
+     weddings=data||[];
+     // Keep the existing guest/check-in selectors in sync without replacing this selector.
+     if(typeof loadWeddingOptions==="function") await loadWeddingOptions();
    }catch(err){
      const msg='Daftar wedding gagal dimuat: '+(err.message||'periksa koneksi dan izin Supabase');
      $("dgRefGuestRows").innerHTML='<tr><td colspan="6" class="dg-reference-empty">'+safeText(msg)+'</td></tr>';
