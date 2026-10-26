@@ -1597,6 +1597,9 @@ async function loadCheckinStats(preferredWeddingId) {
   await loadWeddingQR();
   await loadCheckinStats();
   await loadGuestList();
+  // Signal that admin authentication and the primary wedding loaders have finished.
+  window.__dgPrimaryDashboardReady = true;
+  window.dispatchEvent(new Event("dg:primary-dashboard-ready"));
   const guestWedding = document.getElementById("guestWedding");
   if (guestWedding) guestWedding.addEventListener("change", () => {});
   const guestListWedding = document.getElementById("guestListWedding");
@@ -1684,6 +1687,11 @@ async function importGuestExcel(){
  const safeText=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
  const formatTime=v=>{if(!v)return "—";const d=new Date(v);return Number.isNaN(d.getTime())?safeText(v):d.toLocaleString("id-ID",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});};
  async function init(){
+   // Wait for the primary authenticated dashboard initializer to finish first.
+   // This prevents an early unauthenticated request from leaving this dropdown empty on iOS Safari.
+   if(!window.__dgPrimaryDashboardReady){
+     await new Promise(resolve=>window.addEventListener("dg:primary-dashboard-ready",resolve,{once:true}));
+   }
    const dashboardSelect=$("dgReferenceWedding");
    const selects=[$("dgReferenceWedding"),$("guestListWedding"),$("guestWedding"),$("checkinWedding")].filter(Boolean);
    // Use the same wedding loader as the working guest/check-in screens, rather than
