@@ -1689,17 +1689,20 @@ async function importGuestExcel(){
  async function init(){
    const dashboardSelect=$("dgReferenceWedding");
    const selects=[$("dgReferenceWedding"),$("guestListWedding"),$("guestWedding"),$("checkinWedding")].filter(Boolean);
-   // Use the same wedding loader as the working guest/check-in screens, rather than
-   // running a competing Supabase request during session restoration on iOS Safari.
+   // Wait for the primary authenticated loader to finish, then reuse its populated
+   // check-in selector. This avoids two concurrent loadWeddingOptions() calls racing
+   // on iOS Safari and leaving the main dashboard selector stuck on its placeholder.
    let weddings=[];
    try{
-     // Authentication is already checked by the page's primary initializer.
-     // Do not run a second auth/RPC check here; on mobile Safari it can race and
-     // leave this separate dashboard selector in its initial empty state.
-     // Reuse the exact loader already used by the working guest-list and check-in panels.
-     // It includes the legacy guest-table fallback and avoids a second, competing Supabase query.
-     weddings=await loadWeddingOptions();
-     if(!Array.isArray(weddings)) weddings=[];
+     if(!window.__dgPrimaryDashboardReady){
+       await new Promise(resolve=>{
+         window.addEventListener("dg:primary-dashboard-ready",resolve,{once:true});
+       });
+     }
+     const sourceSelect=$("checkinWedding");
+     weddings=sourceSelect ? Array.from(sourceSelect.options)
+       .filter(o=>o.value)
+       .map(o=>({id:o.value,bride_name:o.textContent.split(" & ")[0]||"",groom_name:o.textContent.split(" & ").slice(1).join(" & ")||""})) : [];
    }catch(err){
      const msg='Daftar wedding gagal dimuat: '+(err.message||'periksa koneksi dan izin Supabase');
      $("dgRefGuestRows").innerHTML='<tr><td colspan="6" class="dg-reference-empty">'+safeText(msg)+'</td></tr>';
