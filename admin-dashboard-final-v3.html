@@ -1687,11 +1687,6 @@ async function importGuestExcel(){
  const safeText=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
  const formatTime=v=>{if(!v)return "—";const d=new Date(v);return Number.isNaN(d.getTime())?safeText(v):d.toLocaleString("id-ID",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});};
  async function init(){
-   // Wait for the primary authenticated dashboard initializer to finish first.
-   // This prevents an early unauthenticated request from leaving this dropdown empty on iOS Safari.
-   if(!window.__dgPrimaryDashboardReady){
-     await new Promise(resolve=>window.addEventListener("dg:primary-dashboard-ready",resolve,{once:true}));
-   }
    const dashboardSelect=$("dgReferenceWedding");
    const selects=[$("dgReferenceWedding"),$("guestListWedding"),$("guestWedding"),$("checkinWedding")].filter(Boolean);
    // Use the same wedding loader as the working guest/check-in screens, rather than
@@ -1701,11 +1696,10 @@ async function importGuestExcel(){
      // Authentication is already checked by the page's primary initializer.
      // Do not run a second auth/RPC check here; on mobile Safari it can race and
      // leave this separate dashboard selector in its initial empty state.
-     const {data,error}=await supabaseClient.from("Weddings").select("id, bride_name, groom_name").order("id",{ascending:true});
-     if(error)throw error;
-     weddings=data||[];
-     // Keep the existing guest/check-in selectors in sync without replacing this selector.
-     if(typeof loadWeddingOptions==="function") await loadWeddingOptions();
+     // Reuse the exact loader already used by the working guest-list and check-in panels.
+     // It includes the legacy guest-table fallback and avoids a second, competing Supabase query.
+     weddings=await loadWeddingOptions();
+     if(!Array.isArray(weddings)) weddings=[];
    }catch(err){
      const msg='Daftar wedding gagal dimuat: '+(err.message||'periksa koneksi dan izin Supabase');
      $("dgRefGuestRows").innerHTML='<tr><td colspan="6" class="dg-reference-empty">'+safeText(msg)+'</td></tr>';
